@@ -1,9 +1,12 @@
 import { useRef, useState, useContext } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Login() {
     const usernameRef = useRef();
     const passwordRef = useRef();
     const [error, setError] = useState("");
+    const [loginSuccessful, setLoginSuccessful] = useState(false);
 
     function handleSubmission(e) {
         e.preventDefault();
@@ -13,35 +16,62 @@ export default function Login() {
             setError("Invalid username and/or password!");
             return;
         }
-        console.log("Sending login request to server...");
+        console.log(`Sending login request to ${API_URL}/login`);
+        fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username,
+                password,
+            }),
+        })
+            .then((res) => {
+                console.log("Got response:", res);
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Got data:", data);
+                if (!data.success) {
+                    setError(data.message);
+                } else {
+                    setLoginSuccessful(true);
+                }
+            })
+            .catch((err) => {
+                console.error(`Error during fetch: ${err}`);
+            });
     }
 
     return (
-        <div className="flex flex-col justify-center items-center w-[60%] m-auto">
-            {error && <span className="mb-4 text-red-400">{error}</span>}
-            <form
-                className="flex flex-col gap-[10px] w-[40%]"
-                onSubmit={handleSubmission}
-            >
-                <input
-                    ref={usernameRef}
-                    type="text"
-                    placeholder="Username"
-                    className="p-1 text-base"
-                />
-                <input
-                    ref={passwordRef}
-                    type="password"
-                    placeholder="Password"
-                    className="p-1 text-base"
-                />
-                <button className="p-2 text-base bg-blue-400 border-none rounded-md mt-10 hover:bg-blue-500 active:bg-blue-400">
-                    Login
-                </button>
-            </form>
-            <span className="mt-4">
-                Not registered? <a href="/register">Register here</a>
-            </span>
-        </div>
+        <>
+            {loginSuccessful ? (
+                <p>Logged in successfully! Loading home...</p>
+            ) : (
+                <>
+                    <form onSubmit={handleSubmission}>
+                        <label htmlFor="username">Username</label>
+                        <input
+                            type="text"
+                            ref={usernameRef}
+                            id="username"
+                            autoComplete="off"
+                            required
+                        />
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            ref={passwordRef}
+                            id="password"
+                            required
+                        />
+                        <button>Login</button>
+                    </form>
+                    <p>
+                        Not registered? <a href="/register">Register</a> here!
+                    </p>
+                    {error && <p className="text-red-500">{error}</p>}
+                </>
+            )}
+        </>
     );
 }

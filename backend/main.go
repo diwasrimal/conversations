@@ -9,7 +9,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/rs/cors"
 )
@@ -43,7 +42,69 @@ func main() {
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
-	log.Println("checking and logging...")
+	w.Header().Set("Content-Type", "application/json")
+	enc, dec := json.NewEncoder(w), json.NewDecoder(r.Body)
+
+	// Decode username and password
+	data := make(map[string]string)
+	err := dec.Decode(&data)
+	if err != nil {
+		log.Printf("Error decoding: %v\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		err = enc.Encode(map[string]any{
+			"success": false,
+			"message": "Couldn't parse json data",
+		})
+		mustNotErr(err)
+		return
+	}
+
+	// Validate
+	username := strings.Trim(data["username"], " \t\n")
+	password := data["password"]
+	if len(username) == 0 || len(password) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		err := enc.Encode(map[string]any{
+			"success": false,
+			"message": "Username or password is empty",
+		})
+		mustNotErr(err)
+		return
+	}
+
+	// Check from database
+	rows, err := conn.Query(
+		context.Background(),
+		"SELECT * FROM users WHERE username = $1 AND password = $2",
+		username,
+		password,
+	)
+	if err != nil {
+		log.Printf("Error querying database: %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		err := enc.Encode(map[string]any{})
+		mustNotErr(err)
+	}
+	userExists := rows.Next()
+	rows.Close()
+
+	if userExists {
+		log.Printf("Successful login for %v\n", username)
+		w.WriteHeader(http.StatusOK)
+		err := enc.Encode(map[string]any{
+			"success": true,
+			"message": "Successful login",
+		})
+		mustNotErr(err)
+	} else {
+		log.Printf("Unsuccessful login for %v\n", username)
+		w.WriteHeader(http.StatusUnauthorized)
+		err := enc.Encode(map[string]any{
+			"success": false,
+			"message": "Invalid username and/or password",
+		})
+		mustNotErr(err)
+	}
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -78,11 +139,29 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Record into database
-	id := uuid.New().String()
-	_, err = conn.Query(
+	// Check if username is already taken
+	rows, err := conn.Query(context.Background(), "SELECT username FROM users WHERE username = $1", username)
+	if err != nil {
+		log.Printf("Error looking for existing usernames: %v\n", err)
+	}
+	usernameTaken := rows.Next()
+	rows.Close()
+
+	if usernameTaken {
+		log.Printf("Username: %q not already taken!\n", username)
+		w.WriteHeader(http.StatusConflict)
+		err := enc.Encode(map[string]any{
+			"success": false,
+			"message": "Username not available",
+		})
+		mustNotErr(err)
+		return
+	}
+
+	// Register new user with given data
+	_, err = conn.Exec(
 		context.Background(),
-		"INSERT INTO users (id, username, password) VALUES ($1, $2, $3)",
-		id,
+		"INSERT INTO users (username, password) VALUES ($1, $2)",
 		username,
 		password,
 	)
@@ -95,7 +174,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send successful response
-	log.Printf("Registered user: %v, password: %v, id: %v\n", username, password, id)
+	log.Printf("Registered user: %v, password: %v\n", username, password)
 	w.WriteHeader(http.StatusCreated)
 	enc.Encode(map[string]any{
 		"success": true,
@@ -114,8 +193,7 @@ func initDatabase() *pgx.Conn {
 	mustNotErr(err)
 	_, err = conn.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS users (
-			id TEXT NOT NULL PRIMARY KEY,
-			username TEXT NOT NULL,
+			username TEXT NOT NULL PRIMARY KEY,
 			password TEXT NOT NULL
 		)
 	`)

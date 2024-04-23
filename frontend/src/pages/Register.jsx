@@ -7,6 +7,7 @@ export default function Register() {
     const password1Ref = useRef();
     const password2Ref = useRef();
     const [error, setError] = useState("");
+    const [registered, setRegistered] = useState(false);
 
     function handleSubmission(e) {
         e.preventDefault();
@@ -44,6 +45,11 @@ export default function Register() {
             })
             .then((data) => {
                 console.log("got data:", data);
+                if (!data.success) {
+                    setError(data.message);
+                } else {
+                    setRegistered(true);
+                }
             })
             .catch((err) => {
                 console.error("Error during fetch:", err);
@@ -51,37 +57,46 @@ export default function Register() {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center w-[60%] m-auto">
-            {error && <span className="mb-4 text-red-400">{error}</span>}
-            <form
-                className="flex flex-col gap-[10px] w-[40%]"
-                onSubmit={handleSubmission}
-            >
-                <input
-                    ref={usernameRef}
-                    type="text"
-                    placeholder="Username"
-                    className="p-1 text-base"
-                />
-                <input
-                    ref={password1Ref}
-                    type="password"
-                    placeholder="Password"
-                    className="p-1 text-base"
-                />
-                <input
-                    ref={password2Ref}
-                    type="password"
-                    placeholder="Confirm Password"
-                    className="p-1 text-base"
-                />
-                <button className="p-2 text-base bg-blue-400 border-none rounded-md mt-10 hover:bg-blue-500 active:bg-blue-400">
-                    Register
-                </button>
-            </form>
-            <span className="mt-4">
-                Already registered? Go to <a href="/login">Login</a>
-            </span>
-        </div>
+        <>
+            {registered ? (
+                <p>
+                    Registered successfully! You may <a href="/login">login</a>
+                </p>
+            ) : (
+                <>
+                    <form onSubmit={handleSubmission}>
+                        <label htmlFor="username">Username</label>
+                        <input
+                            type="text"
+                            ref={usernameRef}
+                            id="username"
+                            autoComplete="off"
+                            required
+                        />
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            ref={password1Ref}
+                            id="password"
+                            required
+                        />
+                        <label htmlFor="confirm-password">
+                            Confirm Password
+                        </label>
+                        <input
+                            type="password"
+                            ref={password2Ref}
+                            id="confirm-password"
+                            required
+                        />
+                        <button>Register</button>
+                    </form>
+                    <p>
+                        Already registered? <a href="/login">Login</a> here!
+                    </p>
+                    {error && <p className="text-red-500">{error}</p>}
+                </>
+            )}
+        </>
     );
 }
