@@ -1,6 +1,9 @@
+todo.txt
+
 .env
 backend/app
 go.sum
+tmp
 
 # Logs
 logs

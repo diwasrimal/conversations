@@ -1,209 +1,203 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/diwasrimal/gochat/backend/crypto"
+	"github.com/diwasrimal/gochat/backend/db"
+	"github.com/diwasrimal/gochat/backend/middleware"
+
 	"github.com/rs/cors"
 )
 
-type Response struct {
-	success bool
-	message string
-}
-
-var conn *pgx.Conn
+type Json map[string]any
 
 func main() {
-	conn = initDatabase()
-	defer conn.Close(context.Background())
+	db.MustInit()
+	defer db.Close()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/login", handleLogin)
 	mux.HandleFunc("POST /api/register", handleRegister)
+	mux.HandleFunc("POST /api/login", handleLogin)
+	mux.HandleFunc("POST /api/auth", handleAuth)
 
-	// corsOptions := cors.Options{
-	// 	AllowedOrigins: []string{"*"},
-	// 	AllowedMethods: []string{http.MethodGet, http.MethodPost},
-	// }
-	// handler := cors.New(corsOptions).Handler(mux)
-	handler := cors.AllowAll().Handler(mux)
+	handler := cors.AllowAll().Handler(middleware.EnforceJSON(mux))
 
 	port := 3030
 	addr := fmt.Sprintf(":%v", port)
-	log.Printf("Listening on port %v...\n", port)
+	log.Printf("Listening on port %v...\n", 3030)
 	log.Fatal(http.ListenAndServe(addr, handler))
 }
 
-func handleLogin(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	enc, dec := json.NewEncoder(w), json.NewDecoder(r.Body)
-
-	// Decode username and password
-	data := make(map[string]string)
-	err := dec.Decode(&data)
-	if err != nil {
-		log.Printf("Error decoding: %v\n", err)
-		w.WriteHeader(http.StatusBadRequest)
-		err = enc.Encode(map[string]any{
-			"success": false,
-			"message": "Couldn't parse json data",
-		})
-		mustNotErr(err)
-		return
-	}
-
-	// Validate
-	username := strings.Trim(data["username"], " \t\n")
-	password := data["password"]
-	if len(username) == 0 || len(password) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		err := enc.Encode(map[string]any{
-			"success": false,
-			"message": "Username or password is empty",
-		})
-		mustNotErr(err)
-		return
-	}
-
-	// Check from database
-	rows, err := conn.Query(
-		context.Background(),
-		"SELECT * FROM users WHERE username = $1 AND password = $2",
-		username,
-		password,
-	)
-	if err != nil {
-		log.Printf("Error querying database: %v\n", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		err := enc.Encode(map[string]any{})
-		mustNotErr(err)
-	}
-	userExists := rows.Next()
-	rows.Close()
-
-	if userExists {
-		log.Printf("Successful login for %v\n", username)
-		w.WriteHeader(http.StatusOK)
-		err := enc.Encode(map[string]any{
-			"success": true,
-			"message": "Successful login",
-		})
-		mustNotErr(err)
-	} else {
-		log.Printf("Unsuccessful login for %v\n", username)
-		w.WriteHeader(http.StatusUnauthorized)
-		err := enc.Encode(map[string]any{
-			"success": false,
-			"message": "Invalid username and/or password",
-		})
-		mustNotErr(err)
-	}
-}
-
 func handleRegister(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	enc, dec := json.NewEncoder(w), json.NewDecoder(r.Body)
-
-	// Decode username and password
-	data := make(map[string]string)
-	err := dec.Decode(&data)
+	body, err := parseReqBody(r)
 	if err != nil {
-		log.Printf("Error decoding: %v\n", err)
-		w.WriteHeader(http.StatusBadRequest)
-		err = enc.Encode(map[string]any{
+		sendJsonResp(w, http.StatusBadRequest, Json{
 			"success": false,
-			"message": "Couldn't parse json data",
+			"message": "Couldn't parse request body",
 		})
-		mustNotErr(err)
 		return
 	}
 
-	// Validate
-	username := strings.Trim(data["username"], " \t\n")
-	password := data["password"]
-	if len(username) == 0 || len(password) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		err := enc.Encode(map[string]any{
+	username, nameok := body["username"]
+	password, passok := body["password"]
+	if !nameok || !passok {
+		sendJsonResp(w, http.StatusBadRequest, Json{
 			"success": false,
-			"message": "Username or password is empty",
+			"message": "Missing username and/or password",
 		})
-		mustNotErr(err)
 		return
 	}
 
-	// Record into database
+	// Password is bcrypted, so can't be larger than 72 chars
+	if len(password) > 72 {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Password must be within 72 characters",
+		})
+		return
+	}
+
+	log.Printf("Got username: %q and pass: %q\n", username, password)
+
 	// Check if username is already taken
-	rows, err := conn.Query(context.Background(), "SELECT username FROM users WHERE username = $1", username)
+	taken, err := db.IsUsernameTaken(username)
 	if err != nil {
-		log.Printf("Error looking for existing usernames: %v\n", err)
+		log.Printf("Error looking user in db: %v\n", err)
+		sendJsonResp(w, http.StatusInternalServerError, Json{})
+		return
 	}
-	usernameTaken := rows.Next()
-	rows.Close()
-
-	if usernameTaken {
-		log.Printf("Username: %q not already taken!\n", username)
-		w.WriteHeader(http.StatusConflict)
-		err := enc.Encode(map[string]any{
+	if taken {
+		log.Println("Username is already taken!")
+		sendJsonResp(w, http.StatusConflict, Json{
 			"success": false,
-			"message": "Username not available",
+			"message": "Username already taken!",
 		})
-		mustNotErr(err)
 		return
 	}
 
-	// Register new user with given data
-	_, err = conn.Exec(
-		context.Background(),
-		"INSERT INTO users (username, password) VALUES ($1, $2)",
-		username,
-		password,
-	)
+	hash := crypto.MustHashPassword(password)
+	err = db.RecordUser(&db.User{Username: username, PasswordHash: hash})
 	if err != nil {
-		log.Printf("Error inserting to database: %v\n", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		err := enc.Encode(map[string]any{})
-		mustNotErr(err)
+		log.Printf("Error inserting user to database: %v\n", err)
+		sendJsonResp(w, http.StatusInternalServerError, Json{})
 		return
 	}
 
-	// Send successful response
-	log.Printf("Registered user: %v, password: %v\n", username, password)
-	w.WriteHeader(http.StatusCreated)
-	enc.Encode(map[string]any{
+	log.Println("Registered")
+	sendJsonResp(w, http.StatusCreated, Json{
 		"success": true,
 		"message": "Registered!",
 	})
 }
 
-func initDatabase() *pgx.Conn {
-	dburl := os.Getenv("DATABASE_URL")
-	if len(dburl) == 0 {
-		panic("DATABASE_URL not set")
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	body, err := parseReqBody(r)
+	if err != nil {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Couldn't parse request body",
+		})
+		return
 	}
-	fmt.Println("dburl:", dburl)
-	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, dburl)
-	mustNotErr(err)
-	_, err = conn.Exec(ctx, `
-		CREATE TABLE IF NOT EXISTS users (
-			username TEXT NOT NULL PRIMARY KEY,
-			password TEXT NOT NULL
-		)
-	`)
-	mustNotErr(err)
-	return conn
+
+	log.Println("Message body:", body)
+	username, nameok := body["username"]
+	password, passok := body["password"]
+	if !nameok || !passok {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Missing username and/or password",
+		})
+		return
+	}
+
+	log.Printf("Got username: %q and pass: %q for login\n", username, password)
+
+	user, err := db.LookupUser(username)
+	if err != nil {
+		log.Printf("Error looking user in db: %v\n", err)
+		sendJsonResp(w, http.StatusInternalServerError, Json{})
+		return
+	}
+	if user == nil {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Username is not registered!",
+		})
+		return
+	}
+
+	if !crypto.CheckPassword(password, user.PasswordHash) {
+		sendJsonResp(w, http.StatusUnauthorized, Json{
+			"success": false,
+			"message": "Incorrect password!",
+		})
+		return
+	}
+
+	log.Printf("Logging in user: %v\n", username)
+	sessionId := crypto.RandSessionId()
+	db.RecordSession(sessionId, username)
+	sendJsonResp(w, http.StatusOK, Json{
+		"success": true,
+		"message": "Login successful", "sessionId": sessionId,
+	})
 }
 
-// Checks the error and panics if it exists
-func mustNotErr(e error) {
-	if e != nil {
-		panic(e)
+func handleAuth(w http.ResponseWriter, r *http.Request) {
+	body, err := parseReqBody(r)
+	if err != nil {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Couldn't parse request body",
+		})
+		return
 	}
+
+	sessionId, ok := body["sessionId"]
+	if !ok {
+		sendJsonResp(w, http.StatusBadRequest, Json{
+			"success": false,
+			"message": "Must provide session id for authentication",
+		})
+		return
+	}
+
+	session, err := db.LookupSession(sessionId)
+	if err != nil {
+		log.Printf("Error looking session in db: %v\n", err)
+		sendJsonResp(w, http.StatusInternalServerError, Json{})
+		return
+	}
+
+	// No such session exists
+	if session == nil {
+		sendJsonResp(w, http.StatusUnauthorized, Json{})
+		return
+	}
+
+	log.Printf("user: %v logged via session id: %v\n", session.Username, sessionId)
+	sendJsonResp(w, http.StatusOK, Json{
+		"success": true,
+		"message": "Authorized",
+	})
+}
+
+func sendJsonResp(w http.ResponseWriter, status int, body Json) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(body)
+}
+
+func parseReqBody(r *http.Request) (map[string]string, error) {
+	data := make(map[string]string)
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

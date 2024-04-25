@@ -1,6 +1,6 @@
-import { useRef, useState, useContext } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useState, useRef, useEffect } from "react";
+import API_URL from "../api/url";
+import Cookies from "js-cookie";
 
 export default function Login() {
     const usernameRef = useRef();
@@ -30,12 +30,16 @@ export default function Login() {
                 return res.json();
             })
             .then((data) => {
+                const { success, sessionId, message } = data;
                 console.log("Got data:", data);
-                if (!data.success) {
-                    setError(data.message);
-                } else {
-                    setLoginSuccessful(true);
+                if (!success) {
+                    setError(message);
+                    return;
                 }
+                setLoginSuccessful(true);
+                Cookies.set("sessionId", sessionId, {
+                    expires: 7,
+                });
             })
             .catch((err) => {
                 console.error(`Error during fetch: ${err}`);
