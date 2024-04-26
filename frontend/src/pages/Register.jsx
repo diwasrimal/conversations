@@ -93,7 +93,7 @@ export default function Register() {
                     <p>
                         Already registered? <a href="/login">Login</a> here!
                     </p>
-                    {error && <p className="text-red-500">{error}</p>}
+                    {error && <p className="red-text">{error}</p>}
                 </>
             )}
         </>

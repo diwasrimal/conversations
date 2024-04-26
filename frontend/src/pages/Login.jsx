@@ -73,7 +73,7 @@ export default function Login() {
                     <p>
                         Not registered? <a href="/register">Register</a> here!
                     </p>
-                    {error && <p className="text-red-500">{error}</p>}
+                    {error && <p className="red-text">{error}</p>}
                 </>
             )}
         </>

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import API_URL from "../api/url";
 import Cookies from "js-cookie";
 import Login from "./Login";
+import Loader from "../components/Loader";
+import "../styles/Home.css";
 
 export default function Home() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -39,7 +41,46 @@ export default function Home() {
             });
     }, []);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <Loader />;
+    if (!loggedIn) return <Login />;
 
-    return <>{loggedIn ? <h1>Home page</h1> : <Login />}</>;
+    return (
+        <div id="top-wrapper">
+            <div id="grid-container">
+                <aside id="side-bar">
+                    <ul>
+                        {[...Array(50).keys()].map((i) => (
+                            <li key={i}>User {i + 1}</li>
+                        ))}
+                    </ul>
+                </aside>
+                <section id="chat-section">
+                    <ul>
+                        {[...Array(50).keys()].map((_, index) => (
+                            <li
+                                key={index}
+                                className={
+                                    Math.floor(Math.random() * 2) == 0
+                                        ? "sent-message"
+                                        : "received-message"
+                                }
+                            >
+                                <p>
+                                    {`Lorem ipsum dolor sit amet consectetur
+                                adipisicing elit. Quidem mollitia id ipsum
+                                eveniet reprehenderit maiores, quasi possimus
+                                tempora labore, dignissimos consectetur?
+                                Accusantium a possimus ducimus illum quidem sed
+                                quasi neque.`.substring(
+                                        0,
+                                        30 + Math.floor(Math.random() * 100),
+                                    )}
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            </div>
+        </div>
+    );
 }
