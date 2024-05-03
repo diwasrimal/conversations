@@ -27,6 +27,7 @@ export default function Login() {
         })
             .then((res) => {
                 console.log("Got response:", res);
+                if (!res.ok) throw new Error("Resonse not OK");
                 return res.json();
             })
             .then((data) => {
@@ -37,9 +38,9 @@ export default function Login() {
                     return;
                 }
                 setLoginSuccessful(true);
-                Cookies.set("sessionId", sessionId, {
-                    expires: 7,
-                });
+                // Cookies.set("sessionId", sessionId, {
+                //     expires: 7,
+                // });
             })
             .catch((err) => {
                 console.error(`Error during fetch: ${err}`);

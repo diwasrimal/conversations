@@ -40,6 +40,9 @@ export default function Register() {
         })
             .then((res) => {
                 console.log("Got response:", res);
+                if (!res.ok) {
+                    throw new Error("Resonse not OK");
+                }
                 return res.json();
             })
             .then((data) => {
