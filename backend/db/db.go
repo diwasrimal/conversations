@@ -2,131 +2,179 @@ package db
 
 import (
 	"context"
+	"log"
 	"os"
+
+	"github.com/diwasrimal/gochat/backend/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-type User struct {
-	Username     string
-	PasswordHash string
-}
-
-type Session struct {
-	Id       string
-	Username string
-}
 
 var pool *pgxpool.Pool
 
 func MustInit() {
 	url, set := os.LookupEnv("DATABASE_URL")
 	if !set {
-		panic("environment variable 'DATABASE_URL' not set")
+		panic("Environment variable 'DATABASE_URL' not set!")
 	}
 	var err error
 	pool, err = pgxpool.New(context.Background(), url)
 	if err != nil {
 		panic(err)
 	}
-
-	_, err = pool.Exec(
-		context.Background(),
-		`CREATE TABLE IF NOT EXISTS users (
-			username text NOT NULL PRIMARY KEY,
-			password_hash text NOT NULL
-		)`,
-	)
-	if err != nil {
-		panic(err)
-	}
-	_, err = pool.Exec(
-		context.Background(),
-		`CREATE TABLE IF NOT EXISTS sessions (
-			id text NOT NULL PRIMARY KEY,
-			username text NOT NULL REFERENCES users (username)
-		)`,
-	)
-	if err != nil {
-		panic(err)
-	}
+	log.Printf("Intialized db %q", url)
 }
 
 func Close() {
 	pool.Close()
+	log.Println("Closed db")
 }
 
-func LookupUser(username string) (*User, error) {
+func CreateUser(fname, lname, username, passwordHash string) error {
+	_, err := pool.Exec(
+		context.Background(),
+		"INSERT INTO users(fname, lname, username, password_hash) VALUES($1, $2, $3, $4)",
+		fname,
+		lname,
+		username,
+		passwordHash,
+	)
+	return err
+}
+
+func UpdateUser(userId uint64, newUser models.User) error {
+	_, err := pool.Exec(
+		context.Background(),
+		"UPDATE users SET "+
+			"fname = $1, "+
+			"lname = $2, "+
+			"bio = $3 "+
+			"WHERE id = $4",
+		newUser.Fname,
+		newUser.Lname,
+		newUser.Bio,
+		userId,
+	)
+	return err
+}
+
+func GetUserByUsername(username string) (*models.User, error) {
 	rows, err := pool.Query(
 		context.Background(),
-		`SELECT * FROM users WHERE username = $1`,
+		"SELECT * FROM users WHERE username = $1",
 		username,
 	)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	if !rows.Next() {
 		return nil, nil
 	}
-	values, err := rows.Values()
+	user := models.User{}
+	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
 	if err != nil {
 		return nil, err
 	}
-	return &User{
-		Username:     values[0].(string),
-		PasswordHash: values[1].(string),
-	}, nil
+	return &user, nil
 }
 
-func RecordUser(user *User) error {
-	_, err := pool.Exec(
+func GetUserById(id uint64) (*models.User, error) {
+	rows, err := pool.Query(
 		context.Background(),
-		`INSERT INTO users(username, password_hash) VALUES($1, $2)`,
-		user.Username,
-		user.PasswordHash,
+		"SELECT * FROM users WHERE id = $1",
+		id,
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, nil
+	}
+	user := models.User{}
+	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func GetUserBySessionId(sessionId string) (*models.User, error) {
+	rows, err := pool.Query(
+		context.Background(),
+		"SELECT * FROM users WHERE id = ( "+
+			"SELECT user_id FROM user_sessions WHERE session_id = $1 "+
+			")",
+		sessionId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, nil
+	}
+	user := models.User{}
+	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func IsUsernameTaken(username string) (bool, error) {
-	user, err := LookupUser(username)
+	rows, err := pool.Query(
+		context.Background(),
+		"SELECT username FROM users WHERE username = $1",
+		username,
+	)
 	if err != nil {
 		return false, err
 	}
-	userExists := user != nil
-	return userExists, nil
+	defer rows.Close()
+	return rows.Next(), nil
 }
 
-func RecordSession(id string, username string) error {
+func CreateUserSession(userId uint64, sessionId string) error {
 	_, err := pool.Exec(
 		context.Background(),
-		`INSERT INTO sessions(id, username) VALUES($1, $2)`,
-		id,
-		username,
+		"INSERT INTO user_sessions(user_id, session_id) "+
+			"VALUES($1, $2) "+
+			"ON CONFLICT(user_id) DO UPDATE "+
+			"SET session_id = excluded.session_id",
+		userId,
+		sessionId,
 	)
 	return err
 }
 
-func LookupSession(id string) (*Session, error) {
+func DeleteUserSession(sessionId string) error {
+	_, err := pool.Exec(
+		context.Background(),
+		"DELETE FROM user_sessions WHERE session_id = $1",
+		sessionId,
+	)
+	return err
+}
+
+func GetSession(sessionId string) (*models.Session, error) {
 	rows, err := pool.Query(
 		context.Background(),
-		`SELECT * FROM sessions WHERE id = $1`,
-		id,
+		"SELECT * FROM user_sessions WHERE session_id = $1",
+		sessionId,
 	)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	if !rows.Next() {
 		return nil, nil
 	}
-	values, err := rows.Values()
+	session := models.Session{}
+	err = rows.Scan(&session.UserId, &session.SessionId)
 	if err != nil {
 		return nil, err
 	}
-	return &Session{
-		Id:       values[0].(string),
-		Username: values[1].(string),
-	}, nil
+	return &session, nil
 }
