@@ -3,12 +3,12 @@ package models
 import "time"
 
 type User struct {
-	Id           uint64
-	Fname        string
-	Lname        string
-	Username     string
-	PasswordHash string
-	Bio          string
+	Id           uint64 `json:"id"`
+	Fname        string `json:"fname"`
+	Lname        string `json:"lname"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"-"`
+	Bio          string `json:"bio"`
 }
 
 type Session struct {
@@ -17,9 +17,9 @@ type Session struct {
 }
 
 type Message struct {
-	Id         uint64
-	SenderId   uint64
-	ReceiverId uint64
-	Text       string
-	Timestamp  time.Time
+	Id         uint64    `json:"-"`
+	SenderId   uint64    `json:"senderId"`
+	ReceiverId uint64    `json:"receiverId"`
+	Text       string    `json:"text"`
+	Timestamp  time.Time `json:"timestamp"`
 }

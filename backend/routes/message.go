@@ -22,14 +22,14 @@ func MessagesGet(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{"message": "Couldn't parse request body as json"},
 		}
 	}
-	pairId, ok := body["pairId"].(uint64)
-	log.Printf("pairId: %v, %T", pairId, pairId)
+	id, ok := body["pairId"].(float64)
 	if !ok {
 		return api.Response{
 			Code:    http.StatusBadRequest,
-			Payload: types.Json{"message": "Invalid message pair information in request"},
+			Payload: types.Json{"message": "Invalid data about chat pair"},
 		}
 	}
+	pairId := uint64(id)
 	messages, err := db.GetMessagesAmong(userId, pairId)
 	if err != nil {
 		log.Printf("Error getting messsages among (%v, %v) from db: %v\n", userId, pairId, err)
@@ -38,11 +38,9 @@ func MessagesGet(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{"message": "Error retreiving messages"},
 		}
 	}
-	for _, msg := range messages {
-		log.Println("message:", msg)
-	}
+
 	return api.Response{
 		Code:    http.StatusOK,
-		Payload: types.Json{"message": "Messages ..."},
+		Payload: types.Json{"messages": messages},
 	}
 }
