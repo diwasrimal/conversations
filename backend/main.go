@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/diwasrimal/gochat/backend/api"
 	"github.com/diwasrimal/gochat/backend/db"
 	"github.com/diwasrimal/gochat/backend/middleware"
 	"github.com/diwasrimal/gochat/backend/routes"
@@ -12,34 +13,26 @@ import (
 	"github.com/rs/cors"
 )
 
-/*
-- POST /api/login
-- POST /api/register
-- GET /api/messages/:id/:receiver_id
-- GET /api/user/:id/profile
-- PUT /api/user/:id/profile
-*/
-
 func main() {
 	db.MustInit()
 	defer db.Close()
 
+	handlers := map[string]http.Handler{
+		"POST /api/login":    api.MakeHandler(routes.LoginPost),
+		"POST /api/logout":   api.MakeHandler(routes.LogoutGet),
+		"POST /api/register": api.MakeHandler(routes.RegisterPost),
+		"GET /api/tmp":       api.MakeHandler(routes.TmpGet),
+		"GET /api/profile":   middleware.UseAuth(api.MakeHandler(routes.ProfileGet)),
+		"PUT /api/profile":   middleware.UseAuth(api.MakeHandler(routes.ProfilePut)),
+		"GET /api/messages":  middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
+	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/login", routes.LoginPost)
-	mux.HandleFunc("GET /api/logout", routes.LogoutGet)
-	mux.HandleFunc("POST /api/register", routes.RegisterPost)
+	for route, handler := range handlers {
+		mux.Handle(route, handler)
+	}
 
-	profileGetHandler := middleware.UseAuth(http.HandlerFunc(routes.ProfileGet))
-	profilePutHandler := middleware.UseAuth(http.HandlerFunc(routes.ProfilePut))
-	mux.Handle("GET /api/profile", profileGetHandler)
-	mux.Handle("PUT /api/profile", profilePutHandler)
-
-	// messagesGetHandler := middleware.UseAuth(http.HandlerFunc(routes.MessagesGet))
-	// mux.Handle("GET /api/messages/{sender_id}/{receiver_id}", messagesGetHandler)
-
-	handler := cors.AllowAll().Handler(middleware.UseJson(mux))
-
+	finalHandler := cors.AllowAll().Handler(middleware.UseJson(mux))
 	port := 3030
 	addr := fmt.Sprintf(":%v", port)
-	log.Fatal(http.ListenAndServe(addr, handler))
+	log.Fatal(http.ListenAndServe(addr, finalHandler))
 }

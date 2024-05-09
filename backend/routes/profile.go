@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/diwasrimal/gochat/backend/api"
 	"github.com/diwasrimal/gochat/backend/db"
 	"github.com/diwasrimal/gochat/backend/models"
 	"github.com/diwasrimal/gochat/backend/types"
@@ -11,28 +12,35 @@ import (
 )
 
 // Should be used with auth middleware
-func ProfileGet(w http.ResponseWriter, r *http.Request) {
+func ProfileGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
 	user, err := db.GetUserById(userId)
 	if err != nil {
 		log.Printf("Error getting user by id from db: %v\n", err)
-		utils.SendJsonResp(w, http.StatusInternalServerError, types.Json{"message": "Error getting user data"})
-		return
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{"message": "Error getting user data"},
+		}
 	}
-	utils.SendJsonResp(w, http.StatusOK, types.Json{
-		"fname":    user.Fname,
-		"lname":    user.Lname,
-		"username": user.Username,
-		"bio":      user.Bio,
-	})
+	return api.Response{
+		Code: http.StatusOK,
+		Payload: types.Json{
+			"fname":    user.Fname,
+			"lname":    user.Lname,
+			"username": user.Username,
+			"bio":      user.Bio,
+		},
+	}
 }
 
-func ProfilePut(w http.ResponseWriter, r *http.Request) {
+func ProfilePut(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
 	log.Printf("Profile put request with body: %v\n", body)
 	if err != nil {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Couldn't parse request body as json"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Couldn't parse request body as json"},
+		}
 	}
 
 	// Get existing details and update with provided ones
@@ -40,8 +48,10 @@ func ProfilePut(w http.ResponseWriter, r *http.Request) {
 	user, err := db.GetUserById(userId)
 	if err != nil {
 		log.Printf("Error getting user by id from db: %v\n", err)
-		utils.SendJsonResp(w, http.StatusInternalServerError, types.Json{"message": "Error getting user data"})
-		return
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{"message": "Error getting user data"},
+		}
 	}
 
 	var newUser models.User = *user
@@ -65,16 +75,24 @@ func ProfilePut(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !update {
-		utils.SendJsonResp(w, http.StatusOK, types.Json{"message": "No new data to update"})
-		return
+		return api.Response{
+			Code:    http.StatusOK,
+			Payload: types.Json{"message": "No new data to update"},
+		}
 	}
 
 	err = db.UpdateUser(user.Id, newUser)
 	if err == nil {
 		log.Println("Updated user")
-		utils.SendJsonResp(w, http.StatusOK, types.Json{})
+		return api.Response{
+			Code:    http.StatusOK,
+			Payload: types.Json{},
+		}
 	} else {
 		log.Printf("Error updating user in db: %v\n", err)
-		utils.SendJsonResp(w, http.StatusInternalServerError, types.Json{"message": "Error updating user data"})
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{"message": "Error updating user data"},
+		}
 	}
 }

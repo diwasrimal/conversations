@@ -17,7 +17,7 @@ INSERT INTO friends VALUES
 	(5, 4);
 
 INSERT INTO messages(sender_id, receiver_id, text, timestamp) VALUES
-	(1, 2, 'user 1 to 2: hello user 2', 'Sun Jan  5 20:02:53 +0545 2024'),
-	(2, 1, 'user 2 to 1: hi user 1', 'Sun May  3 20:02:53 +0545 2024'),
-	(2, 1, 'user 2 to 1: how are you doing?', 'Sun May  4 20:02:53 +0545 2024');
+	(1, 2, 'user 1 to 2: hello user 2', '2024-01-05 20:02:53'),
+	(2, 1, 'user 2 to 1: hi user 1', '2024-05-03 20:02:53'),
+	(2, 1, 'user 2 to 1: how are you doing?', '2024-05-04 20:02:53');
 	

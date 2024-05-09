@@ -178,3 +178,29 @@ func GetSession(sessionId string) (*models.Session, error) {
 	}
 	return &session, nil
 }
+
+func GetMessagesAmong(userId1, userId2 uint64) ([]models.Message, error) {
+	var messages []models.Message
+	rows, err := pool.Query(
+		context.Background(),
+		"SELECT * FROM messages WHERE "+
+			"(sender_id = $1 AND receiver_id = $2) OR "+
+			"(sender_id = $2 AND receiver_id = $1)"+
+			"ORDER BY timestamp DESC",
+		userId1,
+		userId2,
+	)
+	if err != nil {
+		return messages, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var msg models.Message
+		err := rows.Scan(&msg.Id, &msg.SenderId, &msg.ReceiverId, &msg.Text, &msg.Timestamp)
+		if err != nil {
+			return messages, err
+		}
+		messages = append(messages, msg)
+	}
+	return messages, nil
+}

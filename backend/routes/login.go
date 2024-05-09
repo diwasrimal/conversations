@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/diwasrimal/gochat/backend/api"
 	"github.com/diwasrimal/gochat/backend/db"
 	"github.com/diwasrimal/gochat/backend/types"
 	"github.com/diwasrimal/gochat/backend/utils"
@@ -13,42 +14,54 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func LoginPost(w http.ResponseWriter, r *http.Request) {
+func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
 	log.Printf("Login request with body: %v\n", body)
 	if err != nil {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Couldn't parse request body as json"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Couldn't parse request body as json"},
+		}
 	}
 
 	// Ensure both username and password are given
 	username, usernameOk := body["username"].(string)
 	password, passwordOk := body["password"].(string)
 	if !usernameOk || !passwordOk {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Missing data"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Missing data"},
+		}
 	}
 	username = strings.Trim(username, " \t\n\r")
 	if len(username) == 0 {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Username is empty"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Username is empty"},
+		}
 	}
 
 	// Retreive user details from username and check password
 	user, err := db.GetUserByUsername(username)
 	if err != nil {
 		log.Printf("Error getting user details from db: %v\n", err)
-		utils.SendJsonResp(w, http.StatusInternalServerError, types.Json{"message": "Error logging in"})
-		return
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{"message": "Error logging in"},
+		}
 	}
 	if user == nil {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "No such username exists"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "No such username exists"},
+		}
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		utils.SendJsonResp(w, http.StatusUnauthorized, types.Json{"message": "Incorrect password"})
-		return
+		return api.Response{
+			Code:    http.StatusUnauthorized,
+			Payload: types.Json{"message": "Incorrect password"},
+		}
 	}
 
 	// Create a session and send a cookie with session id
@@ -66,5 +79,8 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	log.Println("Logged in!")
-	utils.SendJsonResp(w, http.StatusAccepted, types.Json{})
+	return api.Response{
+		Code:    http.StatusAccepted,
+		Payload: types.Json{},
+	}
 }

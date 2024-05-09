@@ -14,13 +14,8 @@ CREATE TABLE IF NOT EXISTS messages (
 	sender_id bigserial NOT NULL REFERENCES users(id),
 	receiver_id bigserial NOT NULL REFERENCES users(id),
 	text text NOT NULL,
-	timestamp timestamp NOT NULL
+	timestamp timestamptz NOT NULL
 );
-
--- CREATE TABLE IF NOT EXISTS sessions (
--- 	id text NOT NULL PRIMARY KEY,
--- 	user_id bigserial NOT NULL REFERENCES users(id) UNIQUE
--- );
 
 CREATE TABLE IF NOT EXISTS user_sessions (
 	user_id bigserial NOT NULL PRIMARY KEY REFERENCES users(id),

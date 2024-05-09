@@ -4,28 +4,37 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/diwasrimal/gochat/backend/api"
 	"github.com/diwasrimal/gochat/backend/db"
 	"github.com/diwasrimal/gochat/backend/types"
-	"github.com/diwasrimal/gochat/backend/utils"
 )
 
-func LogoutGet(w http.ResponseWriter, r *http.Request) {
+func LogoutGet(w http.ResponseWriter, r *http.Request) api.Response {
 	cookie, err := r.Cookie("sessionId")
 	if err != nil {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Couldn't find cookie with session credentials"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Couldn't find cookie with session credentials"},
+		}
 	}
 	log.Println("got cookie", cookie)
 	sessionId := cookie.Value
 	if len(sessionId) == 0 {
-		utils.SendJsonResp(w, http.StatusBadRequest, types.Json{"message": "Invalid session credentials for logging out"})
-		return
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Invalid session credentials for logging out"},
+		}
 	}
 	err = db.DeleteUserSession(sessionId)
 	if err != nil {
 		log.Printf("Error deleting user session from db: %v\n", err)
-		utils.SendJsonResp(w, http.StatusInternalServerError, types.Json{"message": "Error removing login credentials"})
-		return
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{"message": "Error removing login credentials"},
+		}
 	}
-	utils.SendJsonResp(w, http.StatusOK, types.Json{})
+	return api.Response{
+		Code:    http.StatusOK,
+		Payload: types.Json{},
+	}
 }
