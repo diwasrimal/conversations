@@ -18,13 +18,14 @@ func main() {
 	defer db.Close()
 
 	handlers := map[string]http.Handler{
-		"POST /api/login":    api.MakeHandler(routes.LoginPost),
-		"POST /api/logout":   api.MakeHandler(routes.LogoutGet),
-		"POST /api/register": api.MakeHandler(routes.RegisterPost),
-		"GET /api/tmp":       api.MakeHandler(routes.TmpGet),
-		"GET /api/profile":   middleware.UseAuth(api.MakeHandler(routes.ProfileGet)),
-		"PUT /api/profile":   middleware.UseAuth(api.MakeHandler(routes.ProfilePut)),
-		"GET /api/messages":  middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
+		"POST /api/login":        api.MakeHandler(routes.LoginPost),
+		"POST /api/logout":       api.MakeHandler(routes.LogoutGet),
+		"POST /api/register":     api.MakeHandler(routes.RegisterPost),
+		"GET /api/tmp":           api.MakeHandler(routes.TmpGet),
+		"GET /api/profile":       middleware.UseAuth(api.MakeHandler(routes.ProfileGet)),
+		"PUT /api/profile":       middleware.UseAuth(api.MakeHandler(routes.ProfilePut)),
+		"GET /api/messages":      middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
+		"GET /api/conversations": middleware.UseAuth(api.MakeHandler(routes.ConversationsGet)),
 	}
 	mux := http.NewServeMux()
 	for route, handler := range handlers {

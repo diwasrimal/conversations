@@ -23,3 +23,9 @@ type Message struct {
 	Text       string    `json:"text"`
 	Timestamp  time.Time `json:"timestamp"`
 }
+
+type Conversation struct {
+	UserId1   uint64    `json:"userId1"`
+	UserId2   uint64    `json:"userId2"`
+	Timestamp time.Time `json:"timestamp"`
+}

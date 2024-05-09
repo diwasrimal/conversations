@@ -204,3 +204,27 @@ func GetMessagesAmong(userId1, userId2 uint64) ([]models.Message, error) {
 	}
 	return messages, nil
 }
+
+func GetConversationsOf(userId uint64) ([]models.Conversation, error) {
+	var conversations []models.Conversation
+	rows, err := pool.Query(
+		context.Background(),
+		"SELECT * FROM conversations WHERE "+
+			"user1_id = $1 OR user2_id = $1 "+
+			"ORDER BY timestamp DESC",
+		userId,
+	)
+	if err != nil {
+		return conversations, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var conv models.Conversation
+		err := rows.Scan(&conv.UserId1, &conv.UserId2, &conv.Timestamp)
+		if err != nil {
+			return conversations, err
+		}
+		conversations = append(conversations, conv)
+	}
+	return conversations, nil
+}
