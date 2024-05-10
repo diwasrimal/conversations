@@ -26,6 +26,7 @@ func main() {
 		"PUT /api/profile":           middleware.UseAuth(api.MakeHandler(routes.ProfilePut)),
 		"GET /api/messages/{pairId}": middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
 		"GET /api/conversations":     middleware.UseAuth(api.MakeHandler(routes.ConversationsGet)),
+		"GET /api/chat-partners":     middleware.UseAuth(api.MakeHandler(routes.ChatPartnersGet)),
 	}
 	mux := http.NewServeMux()
 	for route, handler := range handlers {

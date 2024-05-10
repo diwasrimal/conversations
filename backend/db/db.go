@@ -228,3 +228,30 @@ func GetConversationsOf(userId uint64) ([]models.Conversation, error) {
 	}
 	return conversations, nil
 }
+
+func GetRecentChatPartners(userId uint64) ([]models.User, error) {
+	var partners []models.User
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM users WHERE id IN (
+			SELECT CASE WHEN user1_id = $1 THEN user2_id ELSE user1_id END
+			FROM conversations WHERE
+			user1_id = $1 OR user2_id = $1
+			ORDER BY timestamp DESC
+		)`,
+		userId,
+	)
+	if err != nil {
+		return partners, nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+		if err != nil {
+			return partners, err
+		}
+		partners = append(partners, user)
+	}
+	return partners, nil
+}

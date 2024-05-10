@@ -16,7 +16,11 @@ INSERT INTO friends VALUES
 INSERT INTO messages(sender_id, receiver_id, text, timestamp) VALUES
 	(1, 2, 'user 1 to 2: hello user 2', '2024-01-05 20:02:53'),
 	(2, 1, 'user 2 to 1: hi user 1', '2024-05-03 20:02:53'),
-	(2, 1, 'user 2 to 1: how are you doing?', '2024-05-04 20:02:53');
+	(2, 1, 'user 2 to 1: how are you doing?', '2024-05-04 20:02:53'),
+	(1, 3, 'user 1 to 3: hello user 3', '2024-10-01 01:01:53'),
+	(2, 4, 'user 2 to 4: hello user 4', '2023-10-01 01:01:53');
 
 INSERT INTO conversations(user1_id, user2_id, timestamp) VALUES
-	(1, 2, '2024-05-04 20:02:53'); -- latest
+	(1, 2, '2024-05-04 20:02:53'), -- latest
+	(1, 3, '2024-10-01 01:01:53'),
+	(2, 4, '2023-10-01 01:01:53');
