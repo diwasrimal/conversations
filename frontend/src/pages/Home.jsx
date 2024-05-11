@@ -1,66 +1,78 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import API_URL from "../api/url";
-import Cookies from "js-cookie";
-import Login from "./Login";
-import NavBar from "../components/NavBar";
-import Loader from "../components/Loader";
+import { Navigate } from "react-router-dom";
 import "../styles/Home.css";
+import NavBar from "../components/NavBar";
+import ConversationCard from "../components/ConversationCard";
+import ChatArea from "../components/ChatArea";
+import Loader from "../components/Loader";
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState({}); // Data received from server about logged in user
-    const [selectedUser, setSelectedUser] = useState();
+    const [unauthorized, setUnauthorized] = useState(true);
+    const [chatPartners, setChatPartners] = useState([]);
+    const [selectedChatPartner, setSelectedChatPartner] = useState();
 
+    // Get list of people logged in user has chatted with during mount
     useEffect(() => {
-        fetch(`${API_URL}/homedata`, {
+        let responseOk;
+        fetch(`${API_URL}/chat-partners`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+            },
         })
             .then((res) => {
-                console.log("Got response:", res);
+                responseOk = res.ok;
+                setUnauthorized(res.status === 401);
                 return res.json();
             })
-            .then((body) => {
-                console.log("Got data:", body);
-                if (!body.success) {
-                    console.log("Error receiving data");
-                    return;
-                }
-                setData(body.data);
+            .then((data) => {
+                console.log("data from /api/chat-partners:", data);
+                if (responseOk) setChatPartners(data.partners);
                 setLoading(false);
             })
             .catch((err) => {
-                console.error("Got error while fetching:", err);
+                setLoading(false);
+                console.error(err);
             });
     }, []);
 
     if (loading) return <Loader />;
+    if (unauthorized) return <Navigate to="/login" />;
 
     return (
-        <div id="top-wrapper">
+        <>
             <NavBar />
-            <div id="grid-container">
-                <aside id="side-bar">
+            <main className="home-content">
+                <div className="conversation-list">
+                    <h2>Conversations</h2>
                     <ul>
-                        <li>User 1</li>
-                        <li>User 2</li>
-                        <li>User 3</li>
-                        <li>User 4</li>
-                        {/*data.chatList.map((i, chattableUser) => (
-							<li key={chattableUser.username}>
-								{chattableUser.username}
-							</li>
-						))*/}
+                        {chatPartners.map((partner, _) => (
+                            <ConversationCard
+                                key={partner.id}
+                                isSelected={
+                                    selectedChatPartner?.id === partner.id
+                                }
+                                partner={partner}
+                                clickHandler={() =>
+                                    setSelectedChatPartner(partner)
+                                }
+                            />
+                        ))}
                     </ul>
-                </aside>
-                <section id="chat-section">
-                    {!selectedUser ? (
-                        "Select a chat"
-                    ) : (
-                        <ul>chats come here....</ul>
-                    )}
-                </section>
-            </div>
-        </div>
+                </div>
+                {selectedChatPartner ? (
+                    <ChatArea
+                        key={selectedChatPartner.id}
+                        chatPartner={selectedChatPartner}
+                    />
+                ) : (
+                    <div className="div-with-centered-content">
+                        <p>Select a conversation to chat</p>
+                    </div>
+                )}
+            </main>
+        </>
     );
 }

@@ -1,82 +1,66 @@
 import { useState, useRef, useEffect } from "react";
 import API_URL from "../api/url";
-import Cookies from "js-cookie";
+import { Navigate } from "react-router-dom";
 
 export default function Login() {
     const usernameRef = useRef();
     const passwordRef = useRef();
-    const [error, setError] = useState("");
-    const [loginSuccessful, setLoginSuccessful] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [errMsg, setErrMsg] = useState("");
 
-    function handleSubmission(e) {
+    function handleLogin(e) {
         e.preventDefault();
         const username = usernameRef.current.value.trim();
         const password = passwordRef.current.value;
-        if (username.length == 0 || password.length == 0) {
-            setError("Invalid username and/or password!");
-            return;
-        }
-        console.log(`Sending login request to ${API_URL}/login`);
+        let responseOk;
         fetch(`${API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username,
-                password,
-            }),
+            body: JSON.stringify({ username, password }),
         })
             .then((res) => {
-                console.log("Got response:", res);
-                if (!res.ok) throw new Error("Resonse not OK");
+                responseOk = res.ok;
                 return res.json();
             })
             .then((data) => {
-                const { success, sessionId, message } = data;
-                console.log("Got data:", data);
-                if (!success) {
-                    setError(message);
-                    return;
+                console.log("Resp data from /api/login:", data);
+                if (responseOk) {
+                    localStorage.setItem("loggedInUserId", data.userId);
+                    setLoggedIn(true);
+                } else {
+                    setErrMsg(data.message);
                 }
-                setLoginSuccessful(true);
-                // Cookies.set("sessionId", sessionId, {
-                //     expires: 7,
-                // });
             })
-            .catch((err) => {
-                console.error(`Error during fetch: ${err}`);
-            });
+            .catch((err) => console.error(err));
     }
 
+    if (loggedIn) return <Navigate to="/" />;
+
     return (
-        <>
-            {loginSuccessful ? (
-                <p>Logged in successfully! Loading home...</p>
-            ) : (
-                <>
-                    <form onSubmit={handleSubmission}>
-                        <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            ref={usernameRef}
-                            id="username"
-                            autoComplete="off"
-                            required
-                        />
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            ref={passwordRef}
-                            id="password"
-                            required
-                        />
-                        <button>Login</button>
-                    </form>
-                    <p>
-                        Not registered? <a href="/register">Register</a> here!
-                    </p>
-                    {error && <p className="red-text">{error}</p>}
-                </>
-            )}
-        </>
+        <div>
+            {errMsg && <p className="red-text">{errMsg}</p>}
+            <form onSubmit={handleLogin}>
+                <label htmlFor="username">Username</label>
+                <input
+                    id="username"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Enter your username"
+                    ref={usernameRef}
+                />
+                <label htmlFor="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    autoComplete="off"
+                    placeholder="Enter your password"
+                    ref={passwordRef}
+                />
+                <button>Login</button>
+            </form>
+            <p>
+                Don't have an account? Go to <a href="/register">Register</a>
+            </p>
+        </div>
     );
 }

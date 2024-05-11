@@ -1,0 +1,31 @@
+.conversation-card-div {
+    width: 100%;
+    /* border: 1px solid brown; */
+    border-radius: 10px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    background-color: var(--milky-white);
+    gap: 10px;
+    padding: 10px;
+    transition: background-color 0.1s;
+}
+
+.conversation-card-div:hover {
+    background-color: var(--light-grey);
+    cursor: pointer;
+}
+
+.conversation-card-div.selected {
+    background-color: var(--grey);
+}
+
+.picture-holder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

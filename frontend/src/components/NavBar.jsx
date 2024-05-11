@@ -2,21 +2,26 @@ import "../styles/NavBar.css";
 
 export default function NavBar() {
     return (
-        <nav>
-            <ul>
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li>
-                    <a href="/profile">Profile</a>
-                </li>
-                <li>
-                    <a href="/search">Search</a>
-                </li>
-                <li>
-                    <a href="/logout">Logout</a>
-                </li>
-            </ul>
-        </nav>
+        <aside>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/" title="Home">
+                            <i className="fa-solid fa-house-chimney"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/search" title="Search">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout" title="Logout">
+                            <i className="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
     );
 }

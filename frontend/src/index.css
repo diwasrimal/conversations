@@ -1,6 +1,3 @@
-.red-text {
-    color: red;
-}
 
 * {
     box-sizing: border-box;
@@ -13,4 +10,39 @@ body,
 #root {
     height: 100%;
     font-family: Arial, system-ui;
+}
+
+:root {
+    --navbar-width: 50px;
+    --vertical-seperator-color: rgba(0, 0, 0, 0.4);
+    --grey: rgba(0, 0, 0, 0.1);
+    --light-grey: rgba(0, 0, 0, 0.05);
+    --yellowish-white: #fafaf5;
+    --milky-white: #f9f9f9;
+}
+
+.div-with-centered-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.huge-text {
+    font-size: 36px;
+}
+
+.large-text {
+    font-size: 24px;
+}
+
+.normal-text {
+    font-size: 16px;
+}
+
+.small-text {
+    font-size: 14px;
+}
+
+.red-text {
+    color: red;
 }

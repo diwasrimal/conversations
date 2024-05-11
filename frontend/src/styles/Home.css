@@ -1,64 +1,25 @@
-#top-wrapper {
+.home-content {
+    position: absolute;
+    left: var(--navbar-width);
+    padding: 10px 0;
     display: grid;
-    place-items: center;
-    height: 100%;
-    padding: 0 5px;
+    grid-template-columns: min(40%, 350px) 1fr;
+    background-color: var(--milky-white);
+    height: 100vh;
+    width: calc(100% - var(--navbar-width));
 }
 
-#top-wrapper #grid-container {
-    display: grid;
-    grid-template-columns: min(20%, 200px) auto;
-    width: 100%; /* Take full space of top wrapper */
-}
-
-#side-bar {
-    border: 1px solid black;
-}
-
-#side-bar > ul {
+.conversation-list {
     display: flex;
     flex-flow: column;
+    gap: 20px;
+    padding: 15px;
+    border-right: 2px solid var(--vertical-seperator-color);
+}
+
+.conversation-list ul {
     list-style-type: none;
-    height: 98vh;
-    overflow: scroll;
-}
-
-#side-bar > ul > li {
-    padding: 10px;
-    border: 1px dotted black;
-}
-
-#chat-section {
-    border: 1px solid red;
-}
-
-#chat-section > ul {
-    border: 1px dotted black;
     display: flex;
     flex-flow: column;
-    flex-direction: column-reverse;
-    list-style-type: none;
-    height: 98vh;
-    overflow: scroll;
-    gap: 15px;
-}
-
-#chat-section > ul > li {
-    display: flex;
-    align-items: center;
-}
-
-#chat-section > ul > .received-message {
-    justify-content: left;
-}
-
-#chat-section > ul > .sent-message {
-    justify-content: right;
-}
-
-#chat-section > ul > li > p {
-    padding: 2px 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-    max-width: 70%;
+    gap: 10px;
 }

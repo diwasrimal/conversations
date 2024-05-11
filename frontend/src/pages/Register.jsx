@@ -1,104 +1,104 @@
 import { useRef, useState } from "react";
 import API_URL from "../api/url";
+import { Navigate } from "react-router-dom";
 
 export default function Register() {
+    const fnameRef = useRef();
+    const lnameRef = useRef();
     const usernameRef = useRef();
-    const password1Ref = useRef();
-    const password2Ref = useRef();
-    const [error, setError] = useState("");
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+    const [errMsg, setErrMsg] = useState("");
     const [registered, setRegistered] = useState(false);
 
-    function handleSubmission(e) {
+    function handleRegistration(e) {
         e.preventDefault();
+        const fname = fnameRef.current.value.trim();
+        const lname = lnameRef.current.value.trim();
         const username = usernameRef.current.value.trim();
-        const password1 = password1Ref.current.value;
-        const password2 = password2Ref.current.value;
-        if (username.length == 0) {
-            setError("Username can't be empty");
+        const password = passwordRef.current.value;
+        const confirmPassword = confirmPasswordRef.current.value;
+        if (!fname || !lname || !username || !password || !confirmPassword) {
+            setErrMsg("Must provide all data");
             return;
         }
-        // if (password1.length < 8) {
-        //   setError("Password must have at least 8 characters!");
-        //   return;
-        // }
-        if (password2 != password1) {
-            setError("Passwords do not match!");
+        if (password !== confirmPassword) {
+            setErrMsg("Passwords do not match!");
             return;
         }
-        setError("");
-        console.log(`Sending register request to api at ${API_URL}...`);
-
+        let responseOk;
         fetch(`${API_URL}/register`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username,
-                password: password1,
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fname, lname, username, password }),
         })
             .then((res) => {
-                console.log("Got response:", res);
-                if (!res.ok) {
-                    throw new Error("Resonse not OK");
-                }
+                responseOk = res.ok;
                 return res.json();
             })
             .then((data) => {
-                console.log("got data:", data);
-                if (!data.success) {
-                    setError(data.message);
-                } else {
+                console.log("Response for registration request :", data);
+                if (responseOk) {
                     setRegistered(true);
+                } else {
+                    setErrMsg(data.message);
                 }
             })
-            .catch((err) => {
-                console.error("Error during fetch:", err);
-            });
+            .catch((err) => console.log(err));
     }
 
+    if (registered) return <Navigate to="/login" />;
+
     return (
-        <>
-            {registered ? (
+        <div>
+            {errMsg && <p className="red-text">{errMsg}</p>}
+            <form onSubmit={handleRegistration}>
+                <label htmlFor="fname">First name</label>
+                <input
+                    type="text"
+                    id="fname"
+                    placeholder="ex: John"
+                    autoComplete="off"
+                    ref={fnameRef}
+                    required
+                />
+                <label htmlFor="lname">Last name</label>
+                <input
+                    type="text"
+                    id="lname"
+                    autoComplete="off"
+                    placeholder="ex: Doe"
+                    ref={lnameRef}
+                    required
+                />
+                <label htmlFor="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    autoComplete="off"
+                    placeholder="ex: johndoe24"
+                    ref={usernameRef}
+                    required
+                />
+                <label htmlFor="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    ref={passwordRef}
+                    required
+                />
+                <label htmlFor="confirm-password">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirm-password"
+                    ref={confirmPasswordRef}
+                    required
+                />
+                <button>Register</button>
                 <p>
-                    Registered successfully! You may <a href="/login">login</a>
+                    Already have an account? Go to <a href="/login">Login</a>
                 </p>
-            ) : (
-                <>
-                    <form onSubmit={handleSubmission}>
-                        <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            ref={usernameRef}
-                            id="username"
-                            autoComplete="off"
-                            required
-                        />
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            ref={password1Ref}
-                            id="password"
-                            required
-                        />
-                        <label htmlFor="confirm-password">
-                            Confirm Password
-                        </label>
-                        <input
-                            type="password"
-                            ref={password2Ref}
-                            id="confirm-password"
-                            required
-                        />
-                        <button>Register</button>
-                    </form>
-                    <p>
-                        Already registered? <a href="/login">Login</a> here!
-                    </p>
-                    {error && <p className="red-text">{error}</p>}
-                </>
-            )}
-        </>
+            </form>
+        </div>
     );
 }

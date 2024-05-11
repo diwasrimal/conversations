@@ -1,10 +1,29 @@
-nav {
-    width: 100%;
+aside {
+    position: fixed;
+    height: 100%;
+    padding: 10px 0;
+    font-size: 18px;
+    width: var(--navbar-width);
+    /* border: 1px solid red; */
 }
 
-nav > ul {
-    display: flex;
+nav {
+    padding: 15px;
+    border-right: 2px solid var(--vertical-seperator-color);
+    height: 100%;
+}
+
+nav ul {
     list-style-type: none;
-    gap: 20px;
-    padding: 10px;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    gap: 30px;
+    margin-top: auto;
+    /* border: 1px solid brown; */
+}
+
+/* Logout at bottom */
+nav ul li:last-child {
+    margin-top: auto;
 }
