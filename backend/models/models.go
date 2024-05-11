@@ -17,7 +17,7 @@ type Session struct {
 }
 
 type Message struct {
-	Id         uint64    `json:"-"`
+	Id         uint64    `json:"id"`
 	SenderId   uint64    `json:"senderId"`
 	ReceiverId uint64    `json:"receiverId"`
 	Text       string    `json:"text"`

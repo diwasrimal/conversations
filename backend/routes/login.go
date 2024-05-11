@@ -81,6 +81,6 @@ func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 	log.Println("Logged in!")
 	return api.Response{
 		Code:    http.StatusAccepted,
-		Payload: types.Json{},
+		Payload: types.Json{"userId": user.Id},
 	}
 }
