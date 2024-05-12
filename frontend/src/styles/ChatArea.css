@@ -4,15 +4,33 @@
     height: 100vh;
     padding: 5px;
     grid-template-rows: 1fr var(--msg-textarea-height);
+    gap: 10px;
 }
 
 .chat-area ul.chat-messages {
     overflow: scroll;
     display: flex;
     flex-flow: column;
-    gap: 40px;
-    border: 1px solid black;
+    gap: 10px;
+    list-style-type: none;
+    /* border: 1px solid black; */
 }
+
+.chat-area ul.chat-messages li {
+    border: 1px solid black;
+    padding: 5px 10px;
+    width: 70%;
+    word-wrap: break-word;
+    background-color: var(--grey);
+    border-radius: 3px;
+    border: none;
+}
+
+.chat-area ul.chat-messages li.sent-msg {
+    position: relative;
+    margin-left: auto;
+}
+
 .chat-area #msg-send-form {
     display: flex;
     gap: 5px;

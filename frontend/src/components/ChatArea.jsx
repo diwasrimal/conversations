@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import API_URL from "../api/url";
 import "../styles/ChatArea.css";
-import Loader from "./Loader";
+import Spinner from "./Spinner";
 import Button from "./Button";
 
 export default function ChatArea({ chatPartner }) {
@@ -43,7 +43,7 @@ export default function ChatArea({ chatPartner }) {
         }
     }
 
-    if (loading) return <Loader />;
+    if (loading) return <Spinner />;
     if (messages.length === 0) return <div>No Messages!</div>;
 
     return (

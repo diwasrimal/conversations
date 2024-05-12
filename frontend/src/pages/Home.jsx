@@ -5,7 +5,7 @@ import "../styles/Home.css";
 import NavBar from "../components/NavBar";
 import ConversationCard from "../components/ConversationCard";
 import ChatArea from "../components/ChatArea";
-import Loader from "../components/Loader";
+import Spinner from "../components/Spinner";
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function Home() {
             });
     }, []);
 
-    if (loading) return <Loader />;
+    if (loading) return <Spinner />;
     if (unauthorized) return <Navigate to="/login" />;
 
     return (
