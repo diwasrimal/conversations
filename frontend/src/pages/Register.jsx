@@ -23,6 +23,10 @@ export default function Register() {
             setErrMsg("Must provide all data");
             return;
         }
+        if (username.indexOf(" ") > 0) {
+            setErrMsg("Username cannot contain space");
+            return;
+        }
         if (password !== confirmPassword) {
             setErrMsg("Passwords do not match!");
             return;

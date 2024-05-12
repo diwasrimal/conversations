@@ -41,6 +41,12 @@ func RegisterPost(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{"message": "Data should not be empty"},
 		}
 	}
+	if strings.Contains(username, " \t\n\r") {
+		return api.Response{
+			Code:    http.StatusBadRequest,
+			Payload: types.Json{"message": "Username cannot contain spaces."},
+		}
+	}
 
 	// Hash password with bcrypt
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
