@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import API_URL from "../api/url";
 import "../styles/ChatArea.css";
 import Loader from "./Loader";
+import Button from "./Button";
 
 export default function ChatArea({ chatPartner }) {
     const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
@@ -70,7 +71,7 @@ export default function ChatArea({ chatPartner }) {
                     ref={msgRef}
                     onKeyDown={sendMessageOnEnterKey}
                 ></textarea>
-                <button>Send</button>
+                <Button style={{ height: "30px" }}>Send</Button>
             </form>
         </div>
     );

@@ -1,7 +1,6 @@
 .home-content {
     position: absolute;
     left: var(--navbar-width);
-    padding: 10px 0;
     display: grid;
     grid-template-columns: min(40%, 350px) 1fr;
     background-color: var(--milky-white);

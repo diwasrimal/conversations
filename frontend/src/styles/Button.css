@@ -2,8 +2,7 @@
     width: var(--width);
     height: var(--height);
     background-color: var(--grey);
-    border: none;
-    border-radius: 5px;
+    border: 1px solid var(--brown);
 }
 
 .button:hover {

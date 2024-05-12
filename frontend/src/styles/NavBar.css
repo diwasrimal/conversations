@@ -1,26 +1,27 @@
 aside {
     position: fixed;
     height: 100%;
-    padding: 10px 0;
-    font-size: 18px;
     width: var(--navbar-width);
-    /* border: 1px solid red; */
 }
 
 nav {
-    padding: 15px;
     border-right: 2px solid var(--brown);
     height: 100%;
+    padding: 20px 0;
 }
 
 nav ul {
+    font-size: 18px;
     list-style-type: none;
     display: flex;
     flex-flow: column;
     height: 100%;
     gap: 30px;
     margin-top: auto;
-    /* border: 1px solid brown; */
+}
+
+nav ul li {
+    text-align: center;
 }
 
 /* Logout at bottom */
