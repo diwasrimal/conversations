@@ -33,3 +33,6 @@ CREATE TABLE IF NOT EXISTS friends (
 	user2_id bigserial NOT NULL REFERENCES users(id)
 );
 CREATE UNIQUE INDEX unique_friend_pair ON friends(LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id));
+
+-- To search users
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;

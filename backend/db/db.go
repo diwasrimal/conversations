@@ -7,6 +7,7 @@ import (
 
 	"github.com/diwasrimal/gochat/backend/models"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -199,7 +200,7 @@ func GetMessagesAmong(userId1, userId2 uint64) ([]models.Message, error) {
 		}
 		messages = append(messages, msg)
 	}
-	return messages, nil
+	return messages, nil // TODO: maybe add limit
 }
 
 func GetConversationsOf(userId uint64) ([]models.Conversation, error) {
@@ -223,7 +224,7 @@ func GetConversationsOf(userId uint64) ([]models.Conversation, error) {
 		}
 		conversations = append(conversations, conv)
 	}
-	return conversations, nil
+	return conversations, nil // TODO: maybe add limit
 }
 
 func GetRecentChatPartners(userId uint64) ([]models.User, error) {
@@ -250,5 +251,46 @@ func GetRecentChatPartners(userId uint64) ([]models.User, error) {
 		}
 		partners = append(partners, user)
 	}
-	return partners, nil
+	return partners, nil // TODO: maybe add limit
+}
+
+func SearchUser(searchType, searchQuery string) ([]models.User, error) {
+	var matches []models.User
+	var rows pgx.Rows
+	var err error
+
+	// Fuzzy search using likeness and levenshtein distance.
+	if searchType == "normal" {
+		maxLevDist := int(0.5 * float64(len(searchQuery)))
+		log.Println("maxLevList:", maxLevDist)
+		rows, err = pool.Query(
+			context.Background(),
+			` SELECT * FROM users WHERE
+				fullname ILIKE '%' || $1 || '%' OR
+				levenshtein(fullname, $1) <= $2
+				ORDER BY levenshtein(fullname, $1) ASC;
+			`,
+			searchQuery,
+			maxLevDist,
+		)
+	} else if searchType == "by-username" {
+		rows, err = pool.Query(
+			context.Background(),
+			"SELECT * FROM users WHERE username ILIKE '%' || $1 || '%'",
+			searchQuery,
+		)
+	}
+	if err != nil {
+		return matches, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
+		if err != nil {
+			return matches, err
+		}
+		matches = append(matches, user)
+	}
+	return matches, nil // TODO: maybe add limit
 }
