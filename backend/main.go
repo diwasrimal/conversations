@@ -19,7 +19,7 @@ func main() {
 
 	handlers := map[string]http.Handler{
 		"POST /api/login":            api.MakeHandler(routes.LoginPost),
-		"POST /api/logout":           api.MakeHandler(routes.LogoutGet),
+		"GET /api/logout":            api.MakeHandler(routes.LogoutGet),
 		"POST /api/register":         api.MakeHandler(routes.RegisterPost),
 		"GET /api/tmp":               api.MakeHandler(routes.TmpGet),
 		"GET /api/profile":           middleware.UseAuth(api.MakeHandler(routes.ProfileGet)),
