@@ -30,12 +30,11 @@ func Close() {
 	log.Println("Closed db")
 }
 
-func CreateUser(fname, lname, username, passwordHash string) error {
+func CreateUser(fullname, username, passwordHash string) error {
 	_, err := pool.Exec(
 		context.Background(),
-		"INSERT INTO users(fname, lname, username, password_hash) VALUES($1, $2, $3, $4)",
-		fname,
-		lname,
+		"INSERT INTO users(fullname, username, password_hash) VALUES($1, $2, $3)",
+		fullname,
 		username,
 		passwordHash,
 	)
@@ -46,12 +45,10 @@ func UpdateUser(userId uint64, newUser models.User) error {
 	_, err := pool.Exec(
 		context.Background(),
 		"UPDATE users SET "+
-			"fname = $1, "+
-			"lname = $2, "+
-			"bio = $3 "+
-			"WHERE id = $4",
-		newUser.Fname,
-		newUser.Lname,
+			"fullname = $1, "+
+			"bio = $2 "+
+			"WHERE id = $3",
+		newUser.Fullname,
 		newUser.Bio,
 		userId,
 	)
@@ -72,7 +69,7 @@ func GetUserByUsername(username string) (*models.User, error) {
 		return nil, nil
 	}
 	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +90,7 @@ func GetUserById(id uint64) (*models.User, error) {
 		return nil, nil
 	}
 	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +113,7 @@ func GetUserBySessionId(sessionId string) (*models.User, error) {
 		return nil, nil
 	}
 	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +244,7 @@ func GetRecentChatPartners(userId uint64) ([]models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.Id, &user.Fname, &user.Lname, &user.Username, &user.PasswordHash, &user.Bio)
+		err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
 		if err != nil {
 			return partners, err
 		}

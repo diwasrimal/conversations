@@ -6,8 +6,7 @@ import Button from "../components/Button";
 import { InputField, LabeledInputField } from "../components/InputFields";
 
 export default function Register() {
-    const fnameRef = useRef();
-    const lnameRef = useRef();
+    const fullnameRef = useRef();
     const usernameRef = useRef();
     const passwordRef = useRef();
     const confirmPasswordRef = useRef();
@@ -16,12 +15,11 @@ export default function Register() {
 
     function handleRegistration(e) {
         e.preventDefault();
-        const fname = fnameRef.current.value.trim();
-        const lname = lnameRef.current.value.trim();
+        const fullname = fullnameRef.current.value.trim();
         const username = usernameRef.current.value.trim();
         const password = passwordRef.current.value;
         const confirmPassword = confirmPasswordRef.current.value;
-        if (!fname || !lname || !username || !password || !confirmPassword) {
+        if (!fullname || !username || !password || !confirmPassword) {
             setErrMsg("Must provide all data");
             return;
         }
@@ -33,7 +31,7 @@ export default function Register() {
         fetch(`${API_URL}/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fname, lname, username, password }),
+            body: JSON.stringify({ fullname, username, password }),
         })
             .then((res) => {
                 responseOk = res.ok;
@@ -58,20 +56,11 @@ export default function Register() {
             {errMsg && <p className="red-text">{errMsg}</p>}
             <form onSubmit={handleRegistration} className="register-form">
                 <LabeledInputField
-                    label="First name"
-                    ref={fnameRef}
+                    label="Full Name"
+                    ref={fullnameRef}
                     type="text"
-                    placeholder="ex: John"
+                    placeholder="ex: John Doe"
                     autoComplete="off"
-                    required
-                />
-                <LabeledInputField
-                    label="Last Name"
-                    type="text"
-                    id="lname"
-                    autoComplete="off"
-                    placeholder="ex: Doe"
-                    ref={lnameRef}
                     required
                 />
                 <LabeledInputField

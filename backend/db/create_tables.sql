@@ -2,8 +2,7 @@ DROP TABLE IF EXISTS users, messages, user_sessions, conversations, friends;
 
 CREATE TABLE IF NOT EXISTS users (
 	id bigserial NOT NULL PRIMARY KEY,
-	fname text NOT NULL,
-	lname text NOT NULL,
+	fullname text NOT NULL,
 	username text NOT NULL UNIQUE,
 	password_hash text NOT NULL,
 	bio text DEFAULT ''

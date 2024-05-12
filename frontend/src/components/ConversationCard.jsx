@@ -14,7 +14,7 @@ export default function ConversationCard({
             <div className="picture-holder">
                 <i className="fa-regular fa-user"></i>
             </div>
-            <p className="normal-text">{`${partner.fname} ${partner.lname}`}</p>
+            <p className="normal-text">{`${partner.fullname}`}</p>
         </div>
     );
 }

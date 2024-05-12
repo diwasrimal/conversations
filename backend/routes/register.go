@@ -24,20 +24,18 @@ func RegisterPost(w http.ResponseWriter, r *http.Request) api.Response {
 	}
 
 	// Ensure data is provided and with reasonable lengths
-	fname, fnameOk := body["fname"].(string)
-	lname, lnameOk := body["lname"].(string)
+	fullname, fullnameOk := body["fullname"].(string)
 	username, usernameOk := body["username"].(string)
 	password, passwordOk := body["password"].(string)
-	if !fnameOk || !lnameOk || !usernameOk || !passwordOk {
+	if !fullnameOk || !usernameOk || !passwordOk {
 		return api.Response{
 			Code:    http.StatusBadRequest,
 			Payload: types.Json{"message": "Missing some data"},
 		}
 	}
-	fname = strings.Trim(fname, " \t\n\r")
-	lname = strings.Trim(lname, " \t\n\r")
+	fullname = strings.Trim(fullname, " \t\n\r")
 	username = strings.Trim(username, " \t\n\r")
-	if len(fname) == 0 || len(lname) == 0 || len(username) == 0 || len(password) == 0 {
+	if len(fullname) == 0 || len(username) == 0 || len(password) == 0 {
 		return api.Response{
 			Code:    http.StatusBadRequest,
 			Payload: types.Json{"message": "Data should not be empty"},
@@ -70,7 +68,7 @@ func RegisterPost(w http.ResponseWriter, r *http.Request) api.Response {
 		}
 	}
 
-	err = db.CreateUser(fname, lname, username, passwordHash)
+	err = db.CreateUser(fullname, username, passwordHash)
 	if err == nil {
 		log.Println("Registered user!")
 		return api.Response{

@@ -15,24 +15,15 @@ import (
 func TestRegisterPost(t *testing.T) {
 	failingPayloads := []types.Json{
 		{
-			"fname": "Diwas",
-			"lname": "Rimal",
+			"fullname": "Diwas Rimal",
 		},
 		{
-			"fname":    "Diwas",
-			"lname":    "Rimal",
+			"fullname": "Diwas Rimal",
 			"username": "   ",
 			"password": "yes",
 		},
 		{
-			"fname":    "Diwas",
-			"lname":    "  ",
-			"username": "drimal",
-			"password": "yes",
-		},
-		{
-			"fname":    "Diwas",
-			"lname":    "Rimal",
+			"fullname": "Diwas Rimal",
 			"username": "drimal",
 			"password": "yesyesyesyesyesyesyesyesyyesyesyesyesyesyesesyesyesyesyesyesyesyesyesyesyes", // more than 72
 		},
@@ -40,8 +31,7 @@ func TestRegisterPost(t *testing.T) {
 
 	passingPayloads := []types.Json{
 		{
-			"fname":    "test:Diwas",
-			"lname":    "test:Rimal",
+			"fullname": "test:Diwas Rimal",
 			"username": "test:" + uuid.New().String(), // username should not conflict with existing one in db
 			"password": "test:yes",
 		},

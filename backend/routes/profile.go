@@ -25,8 +25,7 @@ func ProfileGet(w http.ResponseWriter, r *http.Request) api.Response {
 	return api.Response{
 		Code: http.StatusOK,
 		Payload: types.Json{
-			"fname":    user.Fname,
-			"lname":    user.Lname,
+			"fullname": user.Fullname,
 			"username": user.Username,
 			"bio":      user.Bio,
 		},
@@ -56,17 +55,12 @@ func ProfilePut(w http.ResponseWriter, r *http.Request) api.Response {
 
 	var newUser models.User = *user
 	update := false
-	fname, fnameOk := body["fname"].(string)
-	lname, lnameOk := body["lname"].(string)
+	fullname, fullnameOk := body["fullname"].(string)
 	bio, bioOk := body["bio"].(string)
 
 	// TODO: Maybe just allow updating bio
-	if fnameOk && len(fname) != 0 && fname != user.Fname {
-		newUser.Fname = fname
-		update = true
-	}
-	if lnameOk && len(lname) != 0 && lname != user.Lname {
-		newUser.Lname = lname
+	if fullnameOk && len(fullname) != 0 && fullname != user.Fullname {
+		newUser.Fullname = fullname
 		update = true
 	}
 	if bioOk && len(bio) != 0 && bio != user.Bio {
