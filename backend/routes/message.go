@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/diwasrimal/gochat/backend/api"
-	"github.com/diwasrimal/gochat/backend/db"
-	"github.com/diwasrimal/gochat/backend/types"
+	"github.com/diwasrimal/conversations/backend/api"
+	"github.com/diwasrimal/conversations/backend/db"
+	"github.com/diwasrimal/conversations/backend/types"
 )
 
 // Gets messages among two users from database.

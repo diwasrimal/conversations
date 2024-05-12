@@ -1,4 +1,4 @@
-module github.com/diwasrimal/gochat/backend
+module github.com/diwasrimal/conversations/backend
 
 go 1.22.2
 

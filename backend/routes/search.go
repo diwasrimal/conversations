@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/api"
-	"github.com/diwasrimal/gochat/backend/db"
-	"github.com/diwasrimal/gochat/backend/types"
+	"github.com/diwasrimal/conversations/backend/api"
+	"github.com/diwasrimal/conversations/backend/db"
+	"github.com/diwasrimal/conversations/backend/types"
 )
 
 // Searches for a user by their username based on the search query

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/diwasrimal/gochat/backend/api"
-	"github.com/diwasrimal/gochat/backend/db"
-	"github.com/diwasrimal/gochat/backend/types"
-	"github.com/diwasrimal/gochat/backend/utils"
+	"github.com/diwasrimal/conversations/backend/api"
+	"github.com/diwasrimal/conversations/backend/db"
+	"github.com/diwasrimal/conversations/backend/types"
+	"github.com/diwasrimal/conversations/backend/utils"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

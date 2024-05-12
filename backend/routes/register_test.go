@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/diwasrimal/gochat/backend/types"
+	"github.com/diwasrimal/conversations/backend/types"
 
 	"github.com/google/uuid"
 )

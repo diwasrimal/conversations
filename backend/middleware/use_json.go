@@ -4,8 +4,8 @@ import (
 	"mime"
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/types"
-	"github.com/diwasrimal/gochat/backend/utils"
+	"github.com/diwasrimal/conversations/backend/types"
+	"github.com/diwasrimal/conversations/backend/utils"
 )
 
 func UseJson(nextHandler http.Handler) http.Handler {

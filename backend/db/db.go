@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/diwasrimal/gochat/backend/models"
+	"github.com/diwasrimal/conversations/backend/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

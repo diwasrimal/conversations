@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/api"
-	"github.com/diwasrimal/gochat/backend/db"
-	"github.com/diwasrimal/gochat/backend/middleware"
-	"github.com/diwasrimal/gochat/backend/routes"
+	"github.com/diwasrimal/conversations/backend/api"
+	"github.com/diwasrimal/conversations/backend/db"
+	"github.com/diwasrimal/conversations/backend/middleware"
+	"github.com/diwasrimal/conversations/backend/routes"
 
 	"github.com/rs/cors"
 )

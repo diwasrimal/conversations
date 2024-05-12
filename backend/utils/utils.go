@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/types"
+	"github.com/diwasrimal/conversations/backend/types"
 )
 
 func ParseJson(body io.ReadCloser) (types.Json, error) {

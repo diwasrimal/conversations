@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/db"
-	"github.com/diwasrimal/gochat/backend/types"
-	"github.com/diwasrimal/gochat/backend/utils"
+	"github.com/diwasrimal/conversations/backend/db"
+	"github.com/diwasrimal/conversations/backend/types"
+	"github.com/diwasrimal/conversations/backend/utils"
 )
 
 // Authorizes request by validating session id contained in the cookie

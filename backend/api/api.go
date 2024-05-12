@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/diwasrimal/gochat/backend/types"
-	"github.com/diwasrimal/gochat/backend/utils"
+	"github.com/diwasrimal/conversations/backend/types"
+	"github.com/diwasrimal/conversations/backend/utils"
 )
 
 type Response struct {
