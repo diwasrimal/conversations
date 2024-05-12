@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
+import "../styles/Register.css";
+import Button from "../components/Button";
+import { InputField, LabeledInputField } from "../components/InputFields";
 
 export default function Register() {
     const fnameRef = useRef();
@@ -50,20 +53,20 @@ export default function Register() {
     if (registered) return <Navigate to="/login" />;
 
     return (
-        <div>
+        <div className="register-form-container">
+            <h1>Register to Chats</h1>
             {errMsg && <p className="red-text">{errMsg}</p>}
-            <form onSubmit={handleRegistration}>
-                <label htmlFor="fname">First name</label>
-                <input
+            <form onSubmit={handleRegistration} className="register-form">
+                <LabeledInputField
+                    label="First name"
+                    ref={fnameRef}
                     type="text"
-                    id="fname"
                     placeholder="ex: John"
                     autoComplete="off"
-                    ref={fnameRef}
                     required
                 />
-                <label htmlFor="lname">Last name</label>
-                <input
+                <LabeledInputField
+                    label="Last Name"
                     type="text"
                     id="lname"
                     autoComplete="off"
@@ -71,8 +74,8 @@ export default function Register() {
                     ref={lnameRef}
                     required
                 />
-                <label htmlFor="username">Username</label>
-                <input
+                <LabeledInputField
+                    label="Username"
                     type="text"
                     id="username"
                     autoComplete="off"
@@ -80,21 +83,21 @@ export default function Register() {
                     ref={usernameRef}
                     required
                 />
-                <label htmlFor="password">Password</label>
-                <input
+                <LabeledInputField
+                    label="Password"
                     type="password"
                     id="password"
                     ref={passwordRef}
                     required
                 />
-                <label htmlFor="confirm-password">Confirm Password</label>
-                <input
+                <LabeledInputField
+                    label="Confirm Password"
                     type="password"
                     id="confirm-password"
                     ref={confirmPasswordRef}
                     required
                 />
-                <button>Register</button>
+                <Button>Register</Button>
                 <p>
                     Already have an account? Go to <a href="/login">Login</a>
                 </p>

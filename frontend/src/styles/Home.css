@@ -14,7 +14,7 @@
     flex-flow: column;
     gap: 20px;
     padding: 15px;
-    border-right: 2px solid var(--vertical-seperator-color);
+    border-right: 2px solid var(--brown);
 }
 
 .conversation-list ul {

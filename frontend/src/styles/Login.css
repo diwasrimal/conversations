@@ -1,0 +1,16 @@
+div.login-form-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    gap: 40px;
+}
+
+form.login-form {
+    display: flex;
+    width: min(400px, 80%);
+    flex-flow: column;
+    align-items: center;
+    gap: 20px;
+}

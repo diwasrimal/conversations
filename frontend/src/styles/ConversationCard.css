@@ -5,7 +5,6 @@
     display: flex;
     justify-content: start;
     align-items: center;
-    background-color: var(--milky-white);
     gap: 10px;
     padding: 10px;
     transition: background-color 0.1s;

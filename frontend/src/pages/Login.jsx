@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
+import "../styles/Login.css";
+import { LabeledInputField } from "../components/InputFields";
+import Button from "../components/Button";
 
 export default function Login() {
     const usernameRef = useRef();
@@ -37,26 +40,26 @@ export default function Login() {
     if (loggedIn) return <Navigate to="/" />;
 
     return (
-        <div>
+        <div className="login-form-container">
+            <h1>Login to Chats</h1>
             {errMsg && <p className="red-text">{errMsg}</p>}
-            <form onSubmit={handleLogin}>
-                <label htmlFor="username">Username</label>
-                <input
-                    id="username"
-                    type="text"
-                    autoComplete="off"
-                    placeholder="Enter your username"
+            <form onSubmit={handleLogin} className="login-form">
+                <LabeledInputField
+                    label="Username"
                     ref={usernameRef}
+                    type="text"
+                    placeholder="Enter your username"
+                    autoComplete="off"
+                    required
                 />
-                <label htmlFor="password">Password</label>
-                <input
+                <LabeledInputField
+                    label="Password"
                     type="password"
-                    id="password"
                     autoComplete="off"
                     placeholder="Enter your password"
                     ref={passwordRef}
                 />
-                <button>Login</button>
+                <Button>Login</Button>
             </form>
             <p>
                 Don't have an account? Go to <a href="/register">Register</a>

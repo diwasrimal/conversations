@@ -14,9 +14,10 @@ body,
 
 :root {
     --navbar-width: 50px;
-    --vertical-seperator-color: rgba(0, 0, 0, 0.4);
-    --grey: rgba(0, 0, 0, 0.1);
+    --brown: rgba(0, 0, 0, 0.4);
+    --grey: rgba(0, 0, 0, 0.125);
     --light-grey: rgba(0, 0, 0, 0.05);
+    --dark-grey: rgba(0, 0, 0, 0.175);
     --yellowish-white: #fafaf5;
     --milky-white: #f9f9f9;
 }
