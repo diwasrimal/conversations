@@ -1,11 +1,7 @@
 .home-content {
-    position: absolute;
-    left: var(--navbar-width);
     display: grid;
     grid-template-columns: min(40%, 350px) 1fr;
-    background-color: var(--milky-white);
-    height: 100vh;
-    width: calc(100% - var(--navbar-width));
+    height: 100%; /* 100% of base layout */
 }
 
 .conversation-list {

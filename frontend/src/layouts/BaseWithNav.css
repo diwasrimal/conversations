@@ -1,3 +1,8 @@
+.base {
+    --navbar-width: 50px;
+    height: 100%;   /* 100% of root */
+}
+
 aside {
     position: fixed;
     height: 100%;
@@ -27,4 +32,12 @@ nav ul li {
 /* Logout at bottom */
 nav ul li:last-child {
     margin-top: auto;
+}
+
+.base-main-content {
+    position: absolute;
+    left: var(--navbar-width);
+    background-color: var(--milky-white);
+    height: 100%;
+    width: calc(100% - var(--navbar-width));
 }

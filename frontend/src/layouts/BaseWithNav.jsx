@@ -1,6 +1,17 @@
-import "./NavBar.css";
+import "./BaseWithNav.css";
 
-export default function NavBar() {
+// Represents a base layout of the page including nav bar for a logged in user.
+// Pages like home, search can extend upon this layout.
+export default function BaseWithNav({ children }) {
+    return (
+        <div className="base">
+            <NavBar />
+            <main className="base-main-content">{children}</main>
+        </div>
+    );
+}
+
+function NavBar() {
     return (
         <aside>
             <nav>

@@ -15,7 +15,6 @@ body,
 }
 
 :root {
-    --navbar-width: 50px;
     --brown: rgba(0, 0, 0, 0.4);
     --grey: rgba(0, 0, 0, 0.125);
     --light-grey: rgba(0, 0, 0, 0.05);

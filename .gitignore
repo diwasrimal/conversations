@@ -5,6 +5,8 @@ backend/app
 go.sum
 tmp
 
+Tmp.jsx
+
 # Logs
 logs
 *.log

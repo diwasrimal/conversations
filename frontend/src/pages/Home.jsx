@@ -2,10 +2,10 @@ import { useState, useEffect, useContext } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
 import "./Home.css";
-import NavBar from "../components/NavBar";
 import ConversationCard from "../components/ConversationCard";
 import ChatArea from "../components/ChatArea";
 import Spinner from "../components/Spinner";
+import BaseWithNav from "../layouts/BaseWithNav";
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
@@ -42,9 +42,8 @@ export default function Home() {
     if (unauthorized) return <Navigate to="/login" />;
 
     return (
-        <>
-            <NavBar />
-            <main className="home-content">
+        <BaseWithNav>
+            <div className="home-content">
                 <div className="conversation-list">
                     <h2>Conversations</h2>
                     <ul>
@@ -72,7 +71,7 @@ export default function Home() {
                         <p>Select a conversation to chat</p>
                     </div>
                 )}
-            </main>
-        </>
+            </div>
+        </BaseWithNav>
     );
 }
