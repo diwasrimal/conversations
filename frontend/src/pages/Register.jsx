@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
-import "../styles/Register.css";
+import "./Register.css";
 import Button from "../components/Button";
 import { InputField, LabeledInputField } from "../components/InputFields";
 

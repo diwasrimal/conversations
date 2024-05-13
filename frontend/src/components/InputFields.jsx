@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import "../styles/InputFields.css";
+import "./InputFields.css";
 
 const LabeledInputField = forwardRef(({ label, ...inputProps }, ref) => {
     const id = `${label.replace(" ", "-")}-id`;

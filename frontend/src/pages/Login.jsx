@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
-import "../styles/Login.css";
+import "./Login.css";
 import { LabeledInputField } from "../components/InputFields";
 import Button from "../components/Button";
 

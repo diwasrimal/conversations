@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/ConversationCard.css";
+import "./ConversationCard.css";
 
 export default function ConversationCard({
     isSelected,

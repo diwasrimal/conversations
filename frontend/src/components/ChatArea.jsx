@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import API_URL from "../api/url";
-import "../styles/ChatArea.css";
+import "./ChatArea.css";
 import Spinner from "./Spinner";
 import Button from "./Button";
 

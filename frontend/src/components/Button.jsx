@@ -1,7 +1,7 @@
-import "../styles/Button.css";
+import "./Button.css";
 
 export default function Button({ children, clickHandler, style, ...rest }) {
-    // Set in ../styles/Button.css
+    // Set in ./Button.css
     const vars = {
         "--width": style?.width || "130px",
         "--height": style?.height || "40px",

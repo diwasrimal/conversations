@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
-import "../styles/Home.css";
+import "./Home.css";
 import NavBar from "../components/NavBar";
 import ConversationCard from "../components/ConversationCard";
 import ChatArea from "../components/ChatArea";
