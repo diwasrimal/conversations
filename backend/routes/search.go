@@ -20,7 +20,7 @@ func SearchGet(w http.ResponseWriter, r *http.Request) api.Response {
 	if searchType != "normal" && searchType != "by-username" {
 		return api.Response{
 			Code:    http.StatusBadRequest,
-			Payload: types.Json{"message": "Invalid search type in request url params"},
+			Payload: types.Json{"message": "Invalid search type"},
 		}
 	}
 	if len(searchQuery) == 0 {

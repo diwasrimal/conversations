@@ -20,15 +20,6 @@ export function registerUser(fullname, username, password) {
         .catch((err) => console.error("Error in registerUser():", err));
 }
 
-export function getConversations() {
-    return fetch(`${api}/conversations`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    })
-        .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in getConversations():", err));
-}
-
 export async function getChatPartners() {
     try {
         const res = await fetch(`${api}/chat-partners`, {
