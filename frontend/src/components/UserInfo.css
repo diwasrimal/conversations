@@ -14,3 +14,7 @@
     align-items: center;
     justify-content: center;
 }
+
+.user-info-container .picture-holder img {
+    width: 20px;
+}

@@ -1,10 +1,11 @@
 import "./UserInfo.css";
+import UserIcon from "../assets/user.svg";
 
 export default function UserInfo({ user }) {
     return (
         <div className="user-info-container">
             <div className="picture-holder">
-                <i className="fa-regular fa-user"></i>
+                <img src={UserIcon} alt="User Icon" />
             </div>
             <p className="normal-text">{`${user.fullname}`}</p>
         </div>

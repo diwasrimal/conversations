@@ -1,6 +1,6 @@
 .base {
     --navbar-width: 50px;
-    height: 100%;   /* 100% of root */
+    height: 100%; /* 100% of root */
 }
 
 aside {
@@ -32,6 +32,10 @@ nav ul li {
 /* Logout at bottom */
 nav ul li:last-child {
     margin-top: auto;
+}
+
+nav ul li a img {
+    width: 20px;
 }
 
 .base-main-content {

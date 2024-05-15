@@ -1,3 +1,6 @@
+import HomeIcon from "../assets/house.svg";
+import LogoutIcon from "../assets/logout.svg";
+import SearchIcon from "../assets/search.svg";
 import "./BaseWithNav.css";
 
 // Represents a base layout of the page including nav bar for a logged in user.
@@ -18,17 +21,17 @@ function NavBar() {
                 <ul>
                     <li>
                         <a href="/" title="Home">
-                            <i className="fa-solid fa-house-chimney"></i>
+                            <img src={HomeIcon} alt="Home Icon" />
                         </a>
                     </li>
                     <li>
                         <a href="/search" title="Search">
-                            <i className="fa-solid fa-magnifying-glass"></i>
+                            <img src={SearchIcon} alt="Search Icon" />
                         </a>
                     </li>
                     <li>
                         <a href="/logout" title="Logout">
-                            <i className="fa-solid fa-right-from-bracket"></i>
+                            <img src={LogoutIcon} alt="Logout Icon" />
                         </a>
                     </li>
                 </ul>
