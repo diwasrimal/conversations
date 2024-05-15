@@ -18,13 +18,3 @@
 .conversation-card-div.selected {
     background-color: var(--grey);
 }
-
-.picture-holder {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}

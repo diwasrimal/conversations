@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import API_URL from "../api/url";
 import "./ChatArea.css";
 import Spinner from "./Spinner";
 import Button from "./Button";
+import { getMessages } from "../api/functions";
 
 export default function ChatArea({ chatPartner }) {
     const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
@@ -12,23 +12,11 @@ export default function ChatArea({ chatPartner }) {
 
     // Get messages between logged in user and partner
     useEffect(() => {
-        fetch(`${API_URL}/messages/${chatPartner.id}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-            .then((res) => {
-                return res.json();
-            })
-            .then((data) => {
-                console.log(
-                    `Response for /api/messages/${chatPartner.id}:`,
-                    data
-                );
-                setMessages(data.messages);
-                setLoading(false);
-            })
-            .catch((err) => console.error(err));
-    }, []);
+        getMessages(chatPartner.id).then((payload) => {
+            setMessages(payload.messages);
+            setLoading(false);
+        });
+    }, [chatPartner]);
 
     function sendMessage(e) {
         e?.preventDefault();

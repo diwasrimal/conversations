@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
-import API_URL from "../api/url";
 import { Navigate } from "react-router-dom";
-import "./Register.css";
 import Button from "../components/Button";
-import { InputField, LabeledInputField } from "../components/InputFields";
+import { LabeledInputField } from "../components/InputFields";
+import "./Register.css";
+import { registerUser } from "../api/functions";
+
+// import { registerUser } from "../api/functions";
 
 export default function Register() {
     const fullnameRef = useRef();
@@ -31,25 +33,13 @@ export default function Register() {
             setErrMsg("Passwords do not match!");
             return;
         }
-        let responseOk;
-        fetch(`${API_URL}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fullname, username, password }),
-        })
-            .then((res) => {
-                responseOk = res.ok;
-                return res.json();
-            })
-            .then((data) => {
-                console.log("Response for registration request :", data);
-                if (responseOk) {
-                    setRegistered(true);
-                } else {
-                    setErrMsg(data.message);
-                }
-            })
-            .catch((err) => console.log(err));
+        registerUser(fullname, username, password).then((data) => {
+            if (data.ok) {
+                setRegistered(true);
+            } else {
+                setErrMsg(data.message);
+            }
+        });
     }
 
     if (registered) return <Navigate to="/login" />;
@@ -65,6 +55,7 @@ export default function Register() {
                     type="text"
                     placeholder="ex: John Doe"
                     autoComplete="off"
+                    autoFocus
                     required
                 />
                 <LabeledInputField
@@ -90,7 +81,7 @@ export default function Register() {
                     ref={confirmPasswordRef}
                     required
                 />
-                <Button>Register</Button>
+                <Button>Register</Button>
                 <p>
                     Already have an account? Go to <a href="/login">Login</a>
                 </p>

@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
-import API_URL from "../api/url";
+import { useState, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import "./Login.css";
 import { LabeledInputField } from "../components/InputFields";
 import Button from "../components/Button";
+import { loginUser } from "../api/functions";
 
 export default function Login() {
     const usernameRef = useRef();
@@ -15,26 +15,14 @@ export default function Login() {
         e.preventDefault();
         const username = usernameRef.current.value.trim();
         const password = passwordRef.current.value;
-        let responseOk;
-        fetch(`${API_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-        })
-            .then((res) => {
-                responseOk = res.ok;
-                return res.json();
-            })
-            .then((data) => {
-                console.log("Resp data from /api/login:", data);
-                if (responseOk) {
-                    localStorage.setItem("loggedInUserId", data.userId);
-                    setLoggedIn(true);
-                } else {
-                    setErrMsg(data.message);
-                }
-            })
-            .catch((err) => console.error(err));
+        loginUser(username, password).then((payload) => {
+            if (payload.ok) {
+                localStorage.setItem("loggedInUserId", payload.userId);
+                setLoggedIn(true);
+            } else {
+                setErrMsg(payload.message);
+            }
+        });
     }
 
     if (loggedIn) return <Navigate to="/" />;
@@ -50,6 +38,7 @@ export default function Login() {
                     type="text"
                     placeholder="Enter your username"
                     autoComplete="off"
+                    autoFocus
                     required
                 />
                 <LabeledInputField

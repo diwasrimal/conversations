@@ -1,3 +1,94 @@
+import { useRef, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { searchUser } from "../api/functions";
+import Button from "../components/Button";
+import { InputField } from "../components/InputFields";
+import Spinner from "../components/Spinner";
+import UserInfo from "../components/UserInfo";
+import BaseWithNav from "../layouts/BaseWithNav";
+import "./Search.css";
+
 export default function Search() {
-    return "Search page";
+    const [loading, setLoading] = useState(false);
+    const [results, setResults] = useState([]);
+    const [errMsg, setErrMsg] = useState("");
+    const [unauthorized, setUnauthorized] = useState(false);
+    const searchTypeRef = useRef();
+    const searchQueryRef = useRef();
+
+    function handleSearch(e) {
+        e.preventDefault();
+        const type = searchTypeRef.current.value;
+        const query = searchQueryRef.current.value.trim();
+        if (!type || !query) {
+            setErrMsg("Invalid data for performing search");
+            return;
+        }
+        setLoading(true);
+        searchUser(type, query).then((payload) => {
+            setLoading(false);
+            if (payload.ok) {
+                setResults(payload.matches || []);
+                setErrMsg("");
+            } else {
+                setErrMsg(payload.message);
+                setUnauthorized(payload.status === 401);
+            }
+        });
+    }
+
+    if (unauthorized) return <Navigate to="/login" />;
+
+    return (
+        <BaseWithNav>
+            <div className="search-page-content">
+                <div className="search-area">
+                    <h2>Search users</h2>
+                    {errMsg && <p className="red-text">{errMsg}</p>}
+                    <form className="search-form" onSubmit={handleSearch}>
+                        <label htmlFor="search-type">Search By</label>
+                        <select id="search-type" ref={searchTypeRef}>
+                            <option value="normal">Name</option>
+                            <option value="by-username">Username</option>
+                        </select>
+                        <InputField
+                            ref={searchQueryRef}
+                            placeholder="Search Query"
+                            autoFocus
+                        />
+                        <Button>Search</Button>
+                    </form>
+                </div>
+                {loading ? <Spinner /> : <SearchResults results={results} />}
+            </div>
+        </BaseWithNav>
+    );
+}
+
+function SearchResults({ results }) {
+    function sendFriendRequest(userId) {
+        console.log("Sending friend request to", userId);
+    }
+
+    return (
+        <div className="search-results-container">
+            {results.length === 0 ? (
+                <p>No matches found!</p>
+            ) : (
+                <ul>
+                    {results.map((user, _) => (
+                        <li key={user.id}>
+                            <UserInfo user={user} />
+                            <Button
+                                onClick={() => sendFriendRequest(user.id)}
+                                style={{ width: "70px" }}
+                            >
+                                Add
+                            </Button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
 }

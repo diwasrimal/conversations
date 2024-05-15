@@ -1,20 +1,13 @@
-import { useState } from "react";
 import "./ConversationCard.css";
+import UserInfo from "./UserInfo";
 
-export default function ConversationCard({
-    isSelected,
-    partner,
-    clickHandler,
-}) {
+export default function ConversationCard({ isSelected, partner, ...rest }) {
     return (
         <div
             className={`conversation-card-div ${isSelected && "selected"}`}
-            onClick={clickHandler}
+            {...rest}
         >
-            <div className="picture-holder">
-                <i className="fa-regular fa-user"></i>
-            </div>
-            <p className="normal-text">{`${partner.fullname}`}</p>
+            <UserInfo user={partner} />
         </div>
     );
 }
