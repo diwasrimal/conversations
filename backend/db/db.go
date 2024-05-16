@@ -57,65 +57,38 @@ func UpdateUser(userId uint64, newUser models.User) error {
 }
 
 func GetUserByUsername(username string) (*models.User, error) {
-	rows, err := pool.Query(
+	var user models.User
+	if err := pool.QueryRow(
 		context.Background(),
 		"SELECT * FROM users WHERE username = $1",
 		username,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return nil, nil
-	}
-	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
-	if err != nil {
+	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
 func GetUserById(id uint64) (*models.User, error) {
-	rows, err := pool.Query(
+	var user models.User
+	if err := pool.QueryRow(
 		context.Background(),
 		"SELECT * FROM users WHERE id = $1",
 		id,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return nil, nil
-	}
-	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
-	if err != nil {
+	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
 func GetUserBySessionId(sessionId string) (*models.User, error) {
-	rows, err := pool.Query(
+	var user models.User
+	if err := pool.QueryRow(
 		context.Background(),
 		"SELECT * FROM users WHERE id = ( "+
 			"SELECT user_id FROM user_sessions WHERE session_id = $1 "+
 			")",
 		sessionId,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return nil, nil
-	}
-	user := models.User{}
-	err = rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
-	if err != nil {
+	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -157,21 +130,12 @@ func DeleteUserSession(sessionId string) error {
 }
 
 func GetSession(sessionId string) (*models.Session, error) {
-	rows, err := pool.Query(
+	var session models.Session
+	if err := pool.QueryRow(
 		context.Background(),
 		"SELECT * FROM user_sessions WHERE session_id = $1",
 		sessionId,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return nil, nil
-	}
-	session := models.Session{}
-	err = rows.Scan(&session.UserId, &session.SessionId)
-	if err != nil {
+	).Scan(&session.UserId, &session.SessionId); err != nil {
 		return nil, err
 	}
 	return &session, nil
@@ -194,8 +158,7 @@ func GetMessagesAmong(userId1, userId2 uint64) ([]models.Message, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var msg models.Message
-		err := rows.Scan(&msg.Id, &msg.SenderId, &msg.ReceiverId, &msg.Text, &msg.Timestamp)
-		if err != nil {
+		if err := rows.Scan(&msg.Id, &msg.SenderId, &msg.ReceiverId, &msg.Text, &msg.Timestamp); err != nil {
 			return messages, err
 		}
 		messages = append(messages, msg)
@@ -218,8 +181,7 @@ func GetConversationsOf(userId uint64) ([]models.Conversation, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var conv models.Conversation
-		err := rows.Scan(&conv.UserId1, &conv.UserId2, &conv.Timestamp)
-		if err != nil {
+		if err := rows.Scan(&conv.UserId1, &conv.UserId2, &conv.Timestamp); err != nil {
 			return conversations, err
 		}
 		conversations = append(conversations, conv)
@@ -245,8 +207,7 @@ func GetRecentChatPartners(userId uint64) ([]models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
-		if err != nil {
+		if err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
 			return partners, err
 		}
 		partners = append(partners, user)
@@ -286,8 +247,7 @@ func SearchUser(searchType, searchQuery string) ([]models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio)
-		if err != nil {
+		if err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
 			return matches, err
 		}
 		matches = append(matches, user)
