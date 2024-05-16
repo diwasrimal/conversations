@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS users, messages, user_sessions, conversations, friends;
+DROP TABLE IF EXISTS users, messages, user_sessions, conversations, friends, friend_requests;
 
 CREATE TABLE IF NOT EXISTS users (
 	id bigserial NOT NULL PRIMARY KEY,
@@ -33,6 +33,12 @@ CREATE TABLE IF NOT EXISTS friends (
 	user2_id bigserial NOT NULL REFERENCES users(id)
 );
 CREATE UNIQUE INDEX unique_friend_pair ON friends(LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id));
+
+CREATE TABLE IF NOT EXISTS friend_requests (
+    requestor_id bigserial NOT NULL REFERENCES users(id),
+    receiver_id bigserial NOT NULL REFERENCES users(id),
+    UNIQUE(requestor_id, receiver_id)
+);
 
 -- To search users
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;

@@ -1,4 +1,4 @@
-TRUNCATE users, messages, user_sessions, conversations, friends RESTART IDENTITY;
+TRUNCATE users, messages, user_sessions, conversations, friends, friend_requests RESTART IDENTITY;
 
 -- Fill with dummy data
 INSERT INTO users(fullname, username, password_hash) VALUES

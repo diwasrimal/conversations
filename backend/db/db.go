@@ -294,3 +294,54 @@ func SearchUser(searchType, searchQuery string) ([]models.User, error) {
 	}
 	return matches, nil // TODO: maybe add limit
 }
+
+func RecordFriendRequest(from, to uint64) error {
+	_, err := pool.Exec(
+		context.Background(),
+		`INSERT INTO friend_requests(requestor_id, receiver_id)
+			VALUES($1, $2)
+			ON CONFLICT DO NOTHING`,
+		from,
+		to,
+	)
+	return err
+}
+
+func RecordFriendship(userId1, userId2 uint64) error {
+	// Check if friend request exists
+	_, err := pool.Exec(
+		context.Background(),
+		"INSERT INTO friends(user1_id, user2_id) VALUES($1, $2)",
+		userId1,
+		userId2,
+	)
+	return err
+}
+
+// Returns status of friendship for two users from first user's point of view.
+// Can give 4 statuses, "friends", "req-sent", "req-received", "unknown".
+// Ex. "req-sent" means first user has sent a request to second.
+func GetFriendshipStatus(userId, otherUserId uint64) (string, error) {
+	var status string
+	if err := pool.QueryRow(
+		context.Background(),
+		`SELECT CASE
+			WHEN EXISTS (
+				SELECT 1 FROM friends WHERE
+				(user1_id = $1 AND user2_id = $2) OR
+				(user2_id = $1 AND user1_id = $2) ) THEN 'friends'
+			WHEN EXISTS (
+				SELECT 1 FROM friend_requests WHERE requestor_id = $1 AND receiver_id = $2
+			) THEN 'req-sent'
+			WHEN EXISTS (
+				SELECT 1 FROM friend_requests WHERE receiver_id = $1 AND requestor_id = $2
+			) THEN 'req-received'
+			ELSE 'unknown'
+		END AS status`,
+		userId,
+		otherUserId,
+	).Scan(&status); err != nil {
+		return "", err
+	}
+	return status, nil
+}

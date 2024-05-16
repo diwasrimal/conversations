@@ -18,15 +18,20 @@ func main() {
 	defer db.Close()
 
 	handlers := map[string]http.Handler{
-		"POST /api/login":            api.MakeHandler(routes.LoginPost),
 		"GET /api/logout":            api.MakeHandler(routes.LogoutGet),
-		"POST /api/register":         api.MakeHandler(routes.RegisterPost),
 		"GET /api/tmp":               api.MakeHandler(routes.TmpGet),
+		"POST /api/login":            api.MakeHandler(routes.LoginPost),
+		"POST /api/register":         api.MakeHandler(routes.RegisterPost),
 		"GET /api/profile":           middleware.UseAuth(api.MakeHandler(routes.ProfileGet)),
 		"PUT /api/profile":           middleware.UseAuth(api.MakeHandler(routes.ProfilePut)),
-		"GET /api/messages/{pairId}": middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
 		"GET /api/chat-partners":     middleware.UseAuth(api.MakeHandler(routes.ChatPartnersGet)),
 		"GET /api/search":            middleware.UseAuth(api.MakeHandler(routes.SearchGet)),
+		"GET /api/messages/{pairId}": middleware.UseAuth(api.MakeHandler(routes.MessagesGet)),
+
+		"GET /api/friendship-status/{targetId}": middleware.UseAuth(api.MakeHandler(routes.FriendshipStatusGet)),
+		"POST /api/friend-requests":             middleware.UseAuth(api.MakeHandler(routes.FriendRequestPost)),
+		"POST /api/friends":                     middleware.UseAuth(api.MakeHandler(routes.FriendPost)),
+		"DELETE /api/friend-requests":           middleware.UseAuth(api.MakeHandler(routes.FriendRequestDelete)),
 	}
 	mux := http.NewServeMux()
 	for route, handler := range handlers {
