@@ -17,7 +17,7 @@ export default function Home() {
     useEffect(() => {
         getChatPartners().then((payload) => {
             setLoading(false);
-            setUnauthorized(payload.status === 401);
+            setUnauthorized(payload.statusCode === 401);
             if (payload.ok) {
                 setChatPartners(payload.partners);
             }

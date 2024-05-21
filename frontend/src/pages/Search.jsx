@@ -1,12 +1,15 @@
 import { useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { searchUser } from "../api/functions";
 import Button from "../components/Button";
+import FriendshipManagerButton from "../components/FriendshipManagerButton";
 import { InputField } from "../components/InputFields";
 import Spinner from "../components/Spinner";
 import UserInfo from "../components/UserInfo";
 import BaseWithNav from "../layouts/BaseWithNav";
 import "./Search.css";
+import { searchUser } from "../api/functions";
+
+const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
 
 export default function Search() {
     const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function Search() {
                 setErrMsg("");
             } else {
                 setErrMsg(payload.message);
-                setUnauthorized(payload.status === 401);
+                setUnauthorized(payload.statusCode === 401);
             }
         });
     }
@@ -70,29 +73,31 @@ export default function Search() {
 }
 
 function SearchResults({ results }) {
-    function sendFriendRequest(userId) {
-        console.log("Sending friend request to", userId);
-    }
-
     return (
         <div className="search-results-container">
             {results.length === 0 ? (
                 <p>No matches found!</p>
             ) : (
                 <ul>
-                    {results.map((user) => (
-                        <li key={user.id}>
-                            <UserInfo user={user} />
-                            <Button
-                                onClick={() => sendFriendRequest(user.id)}
-                                style={{ width: "70px" }}
-                            >
-                                Add
-                            </Button>
-                        </li>
-                    ))}
+                    {results.map(
+                        (user) =>
+                            user.id !== loggedInUserId && (
+                                <li key={user.id}>
+                                    <SearchResult user={user} />
+                                </li>
+                            ),
+                    )}
                 </ul>
             )}
         </div>
+    );
+}
+
+function SearchResult({ user }) {
+    return (
+        <>
+            <UserInfo user={user} />
+            <FriendshipManagerButton otherUserId={user.id} style={{ width: "70px" }} />
+        </>
     );
 }
