@@ -63,6 +63,9 @@ func GetUserByUsername(username string) (*models.User, error) {
 		"SELECT * FROM users WHERE username = $1",
 		username,
 	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &user, nil
@@ -75,6 +78,9 @@ func GetUserById(id uint64) (*models.User, error) {
 		"SELECT * FROM users WHERE id = $1",
 		id,
 	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &user, nil
@@ -89,6 +95,9 @@ func GetUserBySessionId(sessionId string) (*models.User, error) {
 			")",
 		sessionId,
 	).Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &user, nil
@@ -136,6 +145,9 @@ func GetSession(sessionId string) (*models.Session, error) {
 		"SELECT * FROM user_sessions WHERE session_id = $1",
 		sessionId,
 	).Scan(&session.UserId, &session.SessionId); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &session, nil
