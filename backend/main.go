@@ -32,6 +32,7 @@ func main() {
 		"POST /api/friend-requests":             middleware.UseAuth(api.MakeHandler(routes.FriendRequestPost)),
 		"DELETE /api/friend-requests":           middleware.UseAuth(api.MakeHandler(routes.FriendRequestDelete)),
 		"POST /api/friends":                     middleware.UseAuth(api.MakeHandler(routes.FriendPost)),
+		"DELETE /api/friends":                   middleware.UseAuth(api.MakeHandler(routes.FriendDelete)),
 	}
 	mux := http.NewServeMux()
 	for route, handler := range handlers {

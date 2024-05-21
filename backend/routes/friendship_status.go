@@ -20,8 +20,8 @@ func FriendshipStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
 	tid, err := strconv.Atoi(r.PathValue("targetId"))
 	targetId := uint64(tid)
 	if userId == targetId {
-		return api.Response {
-			Code: http.StatusBadRequest,
+		return api.Response{
+			Code:    http.StatusBadRequest,
 			Payload: types.Json{"message": "Cannot see friendship status with self"},
 		}
 	}

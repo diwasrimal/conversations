@@ -291,10 +291,21 @@ func DeleteFriendRequest(from, to uint64) error {
 }
 
 func RecordFriendship(userId1, userId2 uint64) error {
-	// Check if friend request exists
 	_, err := pool.Exec(
 		context.Background(),
 		"INSERT INTO friends(user1_id, user2_id) VALUES($1, $2)",
+		userId1,
+		userId2,
+	)
+	return err
+}
+
+func DeleteFriendship(userId1, userId2 uint64) error {
+	_, err := pool.Exec(
+		context.Background(),
+		`DELETE FROM friends WHERE
+			user1_id = $1 AND user2_id = $2 OR
+			user1_id = $2 AND user2_id = $1`,
 		userId1,
 		userId2,
 	)
