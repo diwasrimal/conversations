@@ -16,7 +16,7 @@ import (
 // Should be used with auth middleware.
 func FriendPost(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
-	log.Printf("Friend request with body: %v\n", body)
+	log.Printf("Hit FriendPost() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,
@@ -24,15 +24,17 @@ func FriendPost(w http.ResponseWriter, r *http.Request) api.Response {
 		}
 	}
 	userId := r.Context().Value("userId").(uint64)
-	targetId, ok := body["targetId"].(float64)
+	tid, ok := body["targetId"].(float64)
 	if !ok {
 		return api.Response{
 			Code:    http.StatusBadRequest,
 			Payload: types.Json{"message": "Missing/Invalid targetId in body"},
 		}
 	}
+	targetId := uint64(tid)
 
-	status, err := db.GetFriendshipStatus(userId, uint64(targetId))
+	// Can only be friends if a request was received before from the other user
+	status, err := db.GetFriendshipStatus(userId, targetId)
 	if err != nil {
 		log.Printf("Error checking friendship status while creating new friend: %v\n", err)
 		return api.Response {
@@ -47,9 +49,18 @@ func FriendPost(w http.ResponseWriter, r *http.Request) api.Response {
 		}
 	}
 	
-	err = db.RecordFriendship(userId, uint64(targetId))
+	// Record friend and delete friend request that other user sent before
+	err = db.RecordFriendship(userId, targetId)
 	if err != nil {
 		log.Printf("Error recording friendship among (%v, %v) in db: %v\n", userId, targetId, err)
+		return api.Response{
+			Code:    http.StatusInternalServerError,
+			Payload: types.Json{},
+		}
+	}
+	err = db.DeleteFriendRequest(targetId, userId)
+	if err != nil {
+		log.Printf("Error deleting prev friend request after being friends in db: %v\n", err)
 		return api.Response{
 			Code:    http.StatusInternalServerError,
 			Payload: types.Json{},

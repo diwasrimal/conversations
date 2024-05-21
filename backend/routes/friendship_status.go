@@ -40,6 +40,6 @@ func FriendshipStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
 	}
 	return api.Response{
 		Code:    http.StatusOK,
-		Payload: types.Json{"status": status},
+		Payload: types.Json{"friendshipStatus": status},
 	}
 }
