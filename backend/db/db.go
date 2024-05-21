@@ -267,6 +267,17 @@ func RecordFriendRequest(from, to uint64) error {
 	return err
 }
 
+func DeleteFriendRequest(from, to uint64) error {
+	_, err := pool.Exec(
+		context.Background(),
+		`DELETE FROM friend_requests WHERE
+			requestor_id = $1 AND receiver_id = $2`,
+		from,
+		to,
+	)
+	return err
+}
+
 func RecordFriendship(userId1, userId2 uint64) error {
 	// Check if friend request exists
 	_, err := pool.Exec(

@@ -16,14 +16,21 @@ import (
 // Should be used with auth middleware
 func FriendshipStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
-	targetId, err := strconv.Atoi(r.PathValue("targetId"))
+	tid, err := strconv.Atoi(r.PathValue("targetId"))
+	targetId := uint64(tid)
+	if userId == targetId {
+		return api.Response {
+			Code: http.StatusBadRequest,
+			Payload: types.Json{"message": "Cannot see friendship status with self"},
+		}
+	}
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,
 			Payload: types.Json{"message": "Invalid target user id in request"},
 		}
 	}
-	status, err := db.GetFriendshipStatus(userId, uint64(targetId)) // status from userId's point of view
+	status, err := db.GetFriendshipStatus(userId, targetId) // status from userId's point of view
 	if err != nil {
 		log.Printf("Error getting friendship status from db: %v\n", err)
 		return api.Response{

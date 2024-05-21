@@ -32,6 +32,21 @@ func FriendPost(w http.ResponseWriter, r *http.Request) api.Response {
 		}
 	}
 
+	status, err := db.GetFriendshipStatus(userId, uint64(targetId))
+	if err != nil {
+		log.Printf("Error checking friendship status while creating new friend: %v\n", err)
+		return api.Response {
+			Code: http.StatusInternalServerError,
+			Payload: types.Json{},
+		}
+	}
+	if status != "req-received" {
+		return api.Response{
+			Code: http.StatusBadRequest,
+			Payload: types.Json{"message": "No request was received from other user"},
+		}
+	}
+	
 	err = db.RecordFriendship(userId, uint64(targetId))
 	if err != nil {
 		log.Printf("Error recording friendship among (%v, %v) in db: %v\n", userId, targetId, err)

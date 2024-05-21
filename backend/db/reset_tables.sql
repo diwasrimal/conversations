@@ -24,3 +24,6 @@ INSERT INTO conversations(user1_id, user2_id, timestamp) VALUES
 	(1, 2, '2024-05-04 20:02:53'), -- latest
 	(1, 3, '2024-10-01 01:01:53'),
 	(2, 4, '2023-10-01 01:01:53');
+
+INSERT INTO friend_requests(requestor_id, receiver_id) VALUES
+	(4, 1);	-- mohan -> ram
