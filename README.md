@@ -14,7 +14,7 @@ cd conversations
 ```console
 cd backend
 go build -o app .
-DATABASE_URL="postgres://user:@host/chatdb" ./app
+DATABASE_URL="postgres://user:password@host/chatdb" ./app
 ```
 
 3. Run frontend
