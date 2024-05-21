@@ -34,7 +34,7 @@ export default function Home() {
                     <h2>Conversations</h2>
                     {chatPartners ? (
                         <ul>
-                            {chatPartners.map((partner, _) => (
+                            {chatPartners.map((partner) => (
                                 <ConversationCard
                                     key={partner.id}
                                     isSelected={

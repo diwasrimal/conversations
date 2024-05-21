@@ -1,9 +1,10 @@
 todo.txt
 
+.zed
 .env
 backend/app
 go.sum
-tmp
+tmp*
 
 Tmp.jsx
 

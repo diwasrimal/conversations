@@ -10,7 +10,7 @@ import "./Search.css";
 
 export default function Search() {
     const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState(undefined);
     const [errMsg, setErrMsg] = useState("");
     const [unauthorized, setUnauthorized] = useState(false);
     const searchTypeRef = useRef();
@@ -59,7 +59,11 @@ export default function Search() {
                         <Button>Search</Button>
                     </form>
                 </div>
-                {loading ? <Spinner /> : <SearchResults results={results} />}
+                {loading ? (
+                    <Spinner />
+                ) : (
+                    results !== undefined && <SearchResults results={results} />
+                )}
             </div>
         </BaseWithNav>
     );
@@ -76,7 +80,7 @@ function SearchResults({ results }) {
                 <p>No matches found!</p>
             ) : (
                 <ul>
-                    {results.map((user, _) => (
+                    {results.map((user) => (
                         <li key={user.id}>
                             <UserInfo user={user} />
                             <Button
