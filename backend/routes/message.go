@@ -14,6 +14,7 @@ import (
 // Should be used with authentication middleware
 func MessagesGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit MessagesGet() with userId: %v\n", userId)
 	pairId, err := strconv.Atoi(r.PathValue("pairId"))
 	if err != nil {
 		return api.Response{

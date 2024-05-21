@@ -15,7 +15,7 @@ import (
 
 func RegisterPost(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
-	log.Printf("Register request with body: %v\n", body)
+	log.Printf("Hit RegisterPost() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,

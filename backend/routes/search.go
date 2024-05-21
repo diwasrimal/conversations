@@ -16,7 +16,7 @@ import (
 func SearchGet(w http.ResponseWriter, r *http.Request) api.Response {
 	searchType := r.URL.Query().Get("type")
 	searchQuery := r.URL.Query().Get("query")
-	log.Printf("Search request with params: type: %q, query: %q\n", searchType, searchQuery)
+	log.Printf("Hit SearchGet() with type: %q, query: %q\n", searchType, searchQuery)
 	if searchType != "normal" && searchType != "by-username" {
 		return api.Response{
 			Code:    http.StatusBadRequest,

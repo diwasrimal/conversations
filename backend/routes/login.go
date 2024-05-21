@@ -16,7 +16,7 @@ import (
 
 func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
-	log.Printf("Login request with body: %v\n", body)
+	log.Printf("Hit LoginPost() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,

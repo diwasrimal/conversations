@@ -14,6 +14,7 @@ import (
 // date. Should be used which authentication
 func ChatPartnersGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit ChatPartnersGet() with userId: %v\n", userId)
 	partners, err := db.GetRecentChatPartners(userId)
 	if err != nil {
 		log.Printf("Error getting recent chat partner details of %v: %v\n", userId, err)

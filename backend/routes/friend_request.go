@@ -17,7 +17,7 @@ import (
 // Should be used with auth middleware
 func FriendRequestPost(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
-	log.Printf("Friend request with body: %v\n", body)
+	log.Printf("Hit FriendRequestPost() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,
@@ -70,8 +70,8 @@ func FriendRequestPost(w http.ResponseWriter, r *http.Request) api.Response {
 // Deletes a friend request send from requesting user to provided user
 // if the request was sent previously.
 func FriendRequestDelete(w http.ResponseWriter, r *http.Request) api.Response {
-	log.Printf("Friend req delete request with body: %v\n", r.Body)
 	body, err := utils.ParseJson(r.Body)
+	log.Printf("Hit FriendRequestDelete() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,

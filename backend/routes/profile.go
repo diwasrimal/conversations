@@ -14,6 +14,7 @@ import (
 // Should be used with auth middleware
 func ProfileGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit ProfileGet() with userId: %v\n", userId)
 	user, err := db.GetUserById(userId)
 	if err != nil {
 		log.Printf("Error getting user by id from db: %v\n", err)
@@ -34,7 +35,7 @@ func ProfileGet(w http.ResponseWriter, r *http.Request) api.Response {
 
 func ProfilePut(w http.ResponseWriter, r *http.Request) api.Response {
 	body, err := utils.ParseJson(r.Body)
-	log.Printf("Profile put request with body: %v\n", body)
+	log.Printf("Hit ProfilePut() with body: %v\n", body)
 	if err != nil {
 		return api.Response{
 			Code:    http.StatusBadRequest,

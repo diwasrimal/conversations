@@ -16,6 +16,7 @@ import (
 // Should be used with auth middleware
 func FriendshipStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit FriendshipStatusGet() with userId: %v\n", userId)
 	tid, err := strconv.Atoi(r.PathValue("targetId"))
 	targetId := uint64(tid)
 	if userId == targetId {

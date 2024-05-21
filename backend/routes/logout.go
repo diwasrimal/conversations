@@ -17,7 +17,6 @@ func LogoutGet(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{"message": "Couldn't find cookie with session credentials"},
 		}
 	}
-	log.Println("got cookie", cookie)
 	sessionId := cookie.Value
 	if len(sessionId) == 0 {
 		return api.Response{
