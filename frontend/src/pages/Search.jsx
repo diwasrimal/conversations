@@ -97,7 +97,10 @@ function SearchResult({ user }) {
     return (
         <>
             <UserInfo user={user} />
-            <FriendshipManagerButton otherUserId={user.id} style={{ width: "70px" }} />
+            <FriendshipManagerButton
+                otherUserId={user.id}
+                style={{ width: "70px" }}
+            />
         </>
     );
 }

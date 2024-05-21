@@ -60,7 +60,7 @@ export function getFriendshipStatus(userId) {
         headers: { "Content-Type": "application/json" },
     })
         .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in getFriendshipStatus()", err))
+        .catch((err) => console.error("Error in getFriendshipStatus()", err));
 }
 
 // Sends a friend request from logged in user to provided user
@@ -68,10 +68,10 @@ export function sendFriendRequest(userId) {
     return fetch(`${api}/friend-requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({targetId: userId})
+        body: JSON.stringify({ targetId: userId }),
     })
         .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in sendFriendRequest():", err))
+        .catch((err) => console.error("Error in sendFriendRequest():", err));
 }
 
 // Deletes friend request sent from logged in user to provided user
@@ -79,10 +79,10 @@ export function deleteFriendRequest(userId) {
     return fetch(`${api}/friend-requests`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({targetId: userId})
+        body: JSON.stringify({ targetId: userId }),
     })
         .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in deleteFriendRequest():", err))
+        .catch((err) => console.error("Error in deleteFriendRequest():", err));
 }
 
 // Accepts friend request coming from given user to logged in user
@@ -90,22 +90,21 @@ export function acceptFriendRequest(userId) {
     return fetch(`${api}/friends`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({targetId: userId})
+        body: JSON.stringify({ targetId: userId }),
     })
         .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in acceptFriendRequest():", err))
+        .catch((err) => console.error("Error in acceptFriendRequest():", err));
 }
-
 
 // Delete given user as friend of logged in user
 export function deleteFriend(userId) {
     return fetch(`${api}/friends`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({targetId: userId})
+        body: JSON.stringify({ targetId: userId }),
     })
         .then((res) => makePayload(res))
-        .catch((err) => console.error("Error in deleteFriend():", err))
+        .catch((err) => console.error("Error in deleteFriend():", err));
 }
 
 async function makePayload(res) {
