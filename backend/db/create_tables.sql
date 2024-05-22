@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS users, messages, user_sessions, conversations, friends, friend_requests;
-
 CREATE TABLE IF NOT EXISTS users (
 	id bigserial NOT NULL PRIMARY KEY,
 	fullname text NOT NULL,
