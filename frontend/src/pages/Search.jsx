@@ -79,14 +79,11 @@ function SearchResults({ results }) {
                 <p>No matches found!</p>
             ) : (
                 <ul>
-                    {results.map(
-                        (user) =>
-                            user.id !== loggedInUserId && (
-                                <li key={user.id}>
-                                    <SearchResult user={user} />
-                                </li>
-                            ),
-                    )}
+                    {results.map((user) => (
+                        <li key={user.id}>
+                            <SearchResult user={user} />
+                        </li>
+                    ))}
                 </ul>
             )}
         </div>
@@ -97,10 +94,12 @@ function SearchResult({ user }) {
     return (
         <>
             <UserInfo user={user} />
-            <FriendshipManagerButton
-                otherUserId={user.id}
-                style={{ width: "70px" }}
-            />
+            {user.id !== loggedInUserId && (
+                <FriendshipManagerButton
+                    otherUserId={user.id}
+                    style={{ width: "120px" }}
+                />
+            )}
         </>
     );
 }

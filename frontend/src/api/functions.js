@@ -107,6 +107,26 @@ export function deleteFriend(userId) {
         .catch((err) => console.error("Error in deleteFriend():", err));
 }
 
+// Gives friend list of logged in user
+export function getFriends() {
+    return fetch(`${api}/friends`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+        .then((res) => makePayload(res))
+        .catch((err) => console.error("Error getting friends", err));
+}
+
+// Gives list of users that have sent friend request to logged in user
+export function getFriendRequestors() {
+    return fetch(`${api}/friend-requestors`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+        .then((res) => makePayload(res))
+        .catch((err) => console.error("Error getting friend requestors", err));
+}
+
 async function makePayload(res) {
     return { ok: res.ok, statusCode: res.status, ...(await res.json()) };
 }

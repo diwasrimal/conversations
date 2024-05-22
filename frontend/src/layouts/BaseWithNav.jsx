@@ -1,10 +1,12 @@
 import HomeIcon from "../assets/house.svg";
 import LogoutIcon from "../assets/logout.svg";
 import SearchIcon from "../assets/search.svg";
+import UsersIcon from "../assets/users.svg";
 import "./BaseWithNav.css";
 
 // Represents a base layout of the page including nav bar for a logged in user.
 // Pages like home, search can extend upon this layout.
+// TODO: manage overflows due to scroll
 export default function BaseWithNav({ children }) {
     return (
         <div className="base">
@@ -29,6 +31,12 @@ function NavBar() {
                             <img src={SearchIcon} alt="Search Icon" />
                         </a>
                     </li>
+                    <li>
+                        <a href="/people" title="People">
+                            <img src={UsersIcon} alt="People Icon" />
+                        </a>
+                    </li>
+                    {/* Logout at last */}
                     <li>
                         <a href="/logout" title="Logout">
                             <img src={LogoutIcon} alt="Logout Icon" />

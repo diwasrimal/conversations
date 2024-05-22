@@ -1,0 +1,40 @@
+.people-page-content {
+	display: flex;
+	padding: 20px;
+	gap: 20px;
+	justify-content: center;
+}
+
+.people-page-content > div {
+	width: 40%;
+	max-width: 500px;
+}
+
+.friends-list-container, .requests-list-container {
+	display: flex;
+	flex-flow: column;
+	gap: 20px;
+}
+
+ul.users-list {
+	display: flex;
+	gap: 20px;
+	flex-flow: column;
+	list-style-type: none;
+}
+
+ul.users-list > li {
+	display: flex;
+	justify-content: space-between;
+}
+
+
+@media only screen and (max-width: 600px) {
+	.people-page-content {
+		flex-flow: column;
+		align-items: center;
+	}
+	.people-page-content > div {
+		width: 90%;
+	}
+} 
