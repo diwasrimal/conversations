@@ -106,3 +106,22 @@ func FriendDelete(w http.ResponseWriter, r *http.Request) api.Response {
 		Payload: types.Json{},
 	}
 }
+
+
+// Returns list of users that are friends of requesting user
+func FriendsGet(w http.ResponseWriter, r *http.Request) api.Response {
+	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit FriendsGet() with userId: %v\n", userId)
+	friends, err := db.GetFriends(userId)
+	if err != nil {
+		log.Printf("Error getting friends from db: %v\n", err)
+		return api.Response {
+			Code: http.StatusInternalServerError,
+			Payload: types.Json{},
+		}
+	}
+	return api.Response {
+		Code: http.StatusOK,
+		Payload: types.Json{"friends": friends},
+	}
+}

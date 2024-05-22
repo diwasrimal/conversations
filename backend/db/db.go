@@ -339,3 +339,54 @@ func GetFriendshipStatus(userId, otherUserId uint64) (string, error) {
 	}
 	return status, nil
 }
+
+// Returns list of users that are friends to user with given id
+func GetFriends(userId uint64) ([]models.User, error) {
+	var friends []models.User
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM users WHERE id IN (
+			SELECT CASE WHEN user1_id = $1 THEN user2_id ELSE user1_id END
+			FROM friends WHERE
+			user1_id = $1 OR user2_id = $1
+		)`,
+		userId,
+	)
+	if err != nil {
+		return friends, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+			return friends, err
+		}
+		friends = append(friends, user)
+	}
+	return friends, nil // TODO: maybe add limit
+}
+
+// Returns list of users that have sent request to given user
+func GetFriendRequestorsTo(userId uint64) ([]models.User, error) {
+	var requestors []models.User
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM users WHERE id IN (
+			SELECT requestor_id FROM friend_requests WHERE
+			receiver_id = $1
+		)`,
+		userId,
+	)
+	if err != nil {
+		return requestors, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+			return requestors, err
+		}
+		requestors = append(requestors, user)
+	}
+	return requestors, nil // TODO: maybe add limit
+}

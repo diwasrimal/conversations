@@ -31,8 +31,10 @@ func main() {
 		"GET /api/friendship-status/{targetId}": middleware.UseAuth(api.MakeHandler(routes.FriendshipStatusGet)),
 		"POST /api/friend-requests":             middleware.UseAuth(api.MakeHandler(routes.FriendRequestPost)),
 		"DELETE /api/friend-requests":           middleware.UseAuth(api.MakeHandler(routes.FriendRequestDelete)),
+		"GET /api/friends":                      middleware.UseAuth(api.MakeHandler(routes.FriendsGet)),
 		"POST /api/friends":                     middleware.UseAuth(api.MakeHandler(routes.FriendPost)),
 		"DELETE /api/friends":                   middleware.UseAuth(api.MakeHandler(routes.FriendDelete)),
+		"GET /api/friend-requestors":            middleware.UseAuth(api.MakeHandler(routes.FriendRequestorsGet)),
 	}
 	mux := http.NewServeMux()
 	for route, handler := range handlers {
