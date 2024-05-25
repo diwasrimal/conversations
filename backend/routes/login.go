@@ -76,11 +76,23 @@ func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 			Secure:   true,
 			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
+			Path:     "/",
 		})
 	}
 	log.Println("Logged in!")
 	return api.Response{
 		Code:    http.StatusAccepted,
 		Payload: types.Json{"userId": user.Id},
+	}
+}
+
+// Should be used with auth middleware to work as expected.
+// This function assumes that authentication was handled by
+// middleware and hence just returns a ok status
+func LoginStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
+	log.Printf("Hit LoginStatusGet() with userId: %v\n", r.Context().Value("userId"))
+	return api.Response{
+		Code:    http.StatusOK,
+		Payload: types.Json{},
 	}
 }
