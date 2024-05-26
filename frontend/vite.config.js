@@ -10,6 +10,10 @@ export default defineConfig({
                 // changeOrigin: true,
                 // secure: false,
             },
+            "/ws": {
+                target: "ws://localhost:3030",
+                ws: true,
+            },
         },
     },
     plugins: [react()],

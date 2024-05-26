@@ -1,14 +1,14 @@
-import { useState, useRef } from "react";
-import { Navigate } from "react-router-dom";
+import { useState, useRef, useContext } from "react";
 import "./Login.css";
 import { LabeledInputField } from "../components/InputFields";
 import Button from "../components/Button";
 import { loginUser } from "../api/functions";
+import { Navigate } from "react-router-dom";
 
 export default function Login() {
+    const [loggedIn, setLoggedIn] = useState(false);
     const usernameRef = useRef();
     const passwordRef = useRef();
-    const [loggedIn, setLoggedIn] = useState(false);
     const [errMsg, setErrMsg] = useState("");
 
     function handleLogin(e) {
@@ -23,6 +23,8 @@ export default function Login() {
                 setErrMsg(payload.message);
             }
         });
+        usernameRef.current.value = "";
+        passwordRef.current.value = "";
     }
 
     if (loggedIn) return <Navigate to="/" />;

@@ -5,7 +5,6 @@ import FriendshipManagerButton from "../components/FriendshipManagerButton";
 import { InputField } from "../components/InputFields";
 import Spinner from "../components/Spinner";
 import UserInfo from "../components/UserInfo";
-import BaseWithNav from "../layouts/BaseWithNav";
 import "./Search.css";
 import { searchUser } from "../api/functions";
 
@@ -43,32 +42,30 @@ export default function Search() {
     if (unauthorized) return <Navigate to="/login" />;
 
     return (
-        <BaseWithNav>
-            <div className="search-page-content">
-                <div className="search-area">
-                    <h2>Search users</h2>
-                    {errMsg && <p className="red-text">{errMsg}</p>}
-                    <form className="search-form" onSubmit={handleSearch}>
-                        <label htmlFor="search-type">Search By</label>
-                        <select id="search-type" ref={searchTypeRef}>
-                            <option value="normal">Name</option>
-                            <option value="by-username">Username</option>
-                        </select>
-                        <InputField
-                            ref={searchQueryRef}
-                            placeholder="Search Query"
-                            autoFocus
-                        />
-                        <Button>Search</Button>
-                    </form>
-                </div>
-                {loading ? (
-                    <Spinner />
-                ) : (
-                    results !== undefined && <SearchResults results={results} />
-                )}
+        <div className="search-page-content">
+            <div className="search-area">
+                <h2>Search users</h2>
+                {errMsg && <p className="red-text">{errMsg}</p>}
+                <form className="search-form" onSubmit={handleSearch}>
+                    <label htmlFor="search-type">Search By</label>
+                    <select id="search-type" ref={searchTypeRef}>
+                        <option value="normal">Name</option>
+                        <option value="by-username">Username</option>
+                    </select>
+                    <InputField
+                        ref={searchQueryRef}
+                        placeholder="Search Query"
+                        autoFocus
+                    />
+                    <Button>Search</Button>
+                </form>
             </div>
-        </BaseWithNav>
+            {loading ? (
+                <Spinner />
+            ) : (
+                results !== undefined && <SearchResults results={results} />
+            )}
+        </div>
     );
 }
 

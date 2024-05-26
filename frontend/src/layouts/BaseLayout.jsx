@@ -1,17 +1,20 @@
+import { NavLink, Outlet } from "react-router-dom";
 import HomeIcon from "../assets/house.svg";
 import LogoutIcon from "../assets/logout.svg";
 import SearchIcon from "../assets/search.svg";
 import UsersIcon from "../assets/users.svg";
-import "./BaseWithNav.css";
+import "./BaseLayout.css";
 
 // Represents a base layout of the page including nav bar for a logged in user.
 // Pages like home, search can extend upon this layout.
 // TODO: manage overflows due to scroll
-export default function BaseWithNav({ children }) {
+export default function BaseLayout() {
     return (
         <div className="base">
             <NavBar />
-            <main className="base-main-content">{children}</main>
+            <main className="base-main-content">
+                <Outlet />
+            </main>
         </div>
     );
 }
@@ -22,25 +25,25 @@ function NavBar() {
             <nav>
                 <ul>
                     <li>
-                        <a href="/" title="Home">
+                        <NavLink to="/" title="Home">
                             <img src={HomeIcon} alt="Home Icon" />
-                        </a>
+                        </NavLink>
                     </li>
                     <li>
-                        <a href="/search" title="Search">
+                        <NavLink to="/search" title="Search">
                             <img src={SearchIcon} alt="Search Icon" />
-                        </a>
+                        </NavLink>
                     </li>
                     <li>
-                        <a href="/people" title="People">
+                        <NavLink to="/people" title="People">
                             <img src={UsersIcon} alt="People Icon" />
-                        </a>
+                        </NavLink>
                     </li>
                     {/* Logout at last */}
                     <li>
-                        <a href="/logout" title="Logout">
+                        <NavLink to="/logout" title="Logout">
                             <img src={LogoutIcon} alt="Logout Icon" />
-                        </a>
+                        </NavLink>
                     </li>
                 </ul>
             </nav>

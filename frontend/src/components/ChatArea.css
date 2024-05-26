@@ -10,10 +10,10 @@
 .chat-area ul.chat-messages {
     overflow: scroll;
     display: flex;
-    flex-flow: column;
+    flex-flow: column-reverse;
     gap: 10px;
     list-style-type: none;
-    /* border: 1px solid black; */
+/*     border: 1px solid black; */
 }
 
 .chat-area ul.chat-messages li {

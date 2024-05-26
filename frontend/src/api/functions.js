@@ -10,6 +10,24 @@ export function loginUser(username, password) {
         .catch((err) => console.error("Error in loginUser()", err));
 }
 
+export function logoutSession() {
+    return fetch(`${api}/logout`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+        .then((res) => makePayload(res))
+        .catch((err) => console.error("Error in deleteLoginSession()", err));
+}
+
+export function getLoginStatus() {
+    return fetch(`${api}/login-status`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+        .then((res) => makePayload(res))
+        .catch((err) => console.error("Error in getLoginStatus()", err));
+}
+
 export function registerUser(fullname, username, password) {
     return fetch(`${api}/register`, {
         method: "POST",
