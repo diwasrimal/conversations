@@ -10,6 +10,7 @@ import (
 )
 
 func LogoutGet(w http.ResponseWriter, r *http.Request) api.Response {
+	log.Println("Hit LogoutGet()")
 	cookie, err := r.Cookie("sessionId")
 	if err != nil {
 		return api.Response{

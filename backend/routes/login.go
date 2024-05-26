@@ -90,7 +90,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 // This function assumes that authentication was handled by
 // middleware and hence just returns a ok status
 func LoginStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
-	log.Printf("Hit LoginStatusGet() with userId: %v\n", r.Context().Value("userId"))
+	log.Printf("Login status valid for userId: %v\n", r.Context().Value("userId"))
 	return api.Response{
 		Code:    http.StatusOK,
 		Payload: types.Json{},
