@@ -1,14 +1,20 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Navigate, Outlet } from "react-router-dom";
 import HomeIcon from "../assets/house.svg";
 import LogoutIcon from "../assets/logout.svg";
 import SearchIcon from "../assets/search.svg";
 import UsersIcon from "../assets/users.svg";
 import "./BaseLayout.css";
+import { useContext } from "react";
+import { LoginContext } from "../contexts/LoginProvider";
 
 // Represents a base layout of the page including nav bar for a logged in user.
 // Pages like home, search can extend upon this layout.
 // TODO: manage overflows due to scroll
 export default function BaseLayout() {
+    const { loginInfo } = useContext(LoginContext);
+
+    if (!loginInfo.loggedIn) return <Navigate to="/login" />;
+
     return (
         <div className="base">
             <NavBar />

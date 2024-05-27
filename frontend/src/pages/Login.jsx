@@ -4,9 +4,13 @@ import { LabeledInputField } from "../components/InputFields";
 import Button from "../components/Button";
 import { loginUser } from "../api/functions";
 import { Navigate } from "react-router-dom";
+import { LoginContext } from "../contexts/LoginProvider";
 
 export default function Login() {
-    const [loggedIn, setLoggedIn] = useState(false);
+    const { loginInfo, setLoginInfo } = useContext(LoginContext);
+    if (loginInfo.loggedIn) return <Navigate to="/" />;
+
+    // const [loggedIn, setLoggedIn] = useState(false);
     const usernameRef = useRef();
     const passwordRef = useRef();
     const [errMsg, setErrMsg] = useState("");
@@ -17,8 +21,7 @@ export default function Login() {
         const password = passwordRef.current.value;
         loginUser(username, password).then((payload) => {
             if (payload.ok) {
-                localStorage.setItem("loggedInUserId", payload.userId);
-                setLoggedIn(true);
+                setLoginInfo({loggedIn: true, userId: payload.userId})
             } else {
                 setErrMsg(payload.message);
             }
@@ -27,7 +30,7 @@ export default function Login() {
         passwordRef.current.value = "";
     }
 
-    if (loggedIn) return <Navigate to="/" />;
+    // if (loggedIn) return <Navigate to="/" />;
 
     return (
         <div className="login-form-container">

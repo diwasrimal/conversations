@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import FriendshipManagerButton from "../components/FriendshipManagerButton";
 import Spinner from "../components/Spinner";
 import UserInfo from "../components/UserInfo";
 import { getFriendRequestors, getFriends } from "../api/functions";
 import "./People.css";
+import { LoginContext } from "../contexts/LoginProvider";
 
-const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
+let loggedInUserId;
 
 export default function People() {
     const [loading, setLoading] = useState(true);
@@ -14,6 +15,11 @@ export default function People() {
     const [friendRequestors, setFriendRequestors] = useState([]);
     const [errMsg, setErrMsg] = useState("");
     const [unauthorized, setUnauthorized] = useState(false);
+
+    const { loginInfo } = useContext(LoginContext);
+    useEffect(() => {
+        loggedInUserId = loginInfo.userId;
+    }, [loginInfo]);
 
     useEffect(() => {
         getFriends().then((payload) => {

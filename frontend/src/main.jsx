@@ -11,25 +11,33 @@ import Tmp from "./pages/Tmp";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Logout from "./pages/Logout.jsx";
+import { WebsocketProvider } from "./contexts/WebsocketProvider.jsx";
+import { LoginProvider } from "./contexts/LoginProvider.jsx";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <BaseLayout />,
+        element: (
+            <WebsocketProvider>
+                <BaseLayout />
+            </WebsocketProvider>
+        ),
         children: [
             { element: <Home />, index: true },
             { path: "people", element: <People /> },
             { path: "search", element: <Search /> },
             { path: "tmp", element: <Tmp /> },
+            { path: "logout", element: <Logout /> },
         ],
     },
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
-    { path: "/logout", element: <Logout /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <LoginProvider>
+            <RouterProvider router={router} />
+        </LoginProvider>
     </React.StrictMode>,
 );

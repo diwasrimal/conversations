@@ -1,13 +1,17 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import Button from "../components/Button";
 import { LabeledInputField } from "../components/InputFields";
 import "./Register.css";
 import { registerUser } from "../api/functions";
+import { LoginContext } from "../contexts/LoginProvider";
 
 // import { registerUser } from "../api/functions";
 
 export default function Register() {
+    const { loginInfo } = useContext(LoginContext);
+    if (loginInfo.loggedIn) return <Navigate to="/" />;
+
     const fullnameRef = useRef();
     const usernameRef = useRef();
     const passwordRef = useRef();

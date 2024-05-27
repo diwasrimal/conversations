@@ -1,21 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { logoutSession } from "../api/functions";
 import Spinner from "../components/Spinner";
+import { LoginContext } from "../contexts/LoginProvider";
 
 export default function Logout() {
-	if (!localStorage.getItem("loggedInUserId"))
-		return <Navigate to="/login" />;
-
-	const [ok, setOk] = useState(false);
+	const {loginInfo, setLoginInfo} = useContext(LoginContext)
+	if (!loginInfo.loggedIn) return;
 
 	useEffect(() => {
 		logoutSession().then((payload) => {
-			setOk(payload.ok);
+			if (payload.ok) {
+				setLoginInfo({loggedIn: false, userId: undefined})
+			}
 		});
 	}, []);
-
-	if (ok) return <Navigate to="/login" />;
-
-	return <Spinner />;
 }

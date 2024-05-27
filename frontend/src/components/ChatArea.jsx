@@ -2,18 +2,24 @@ import { useEffect, useState, useRef, useContext } from "react";
 import "./ChatArea.css";
 import Spinner from "./Spinner";
 import Button from "./Button";
-import { getMessages } from "../api/functions";
+import { getMessages, sendFriendRequest } from "../api/functions";
 import { WebsocketContext } from "../contexts/WebsocketProvider";
+import { LoginContext } from "../contexts/LoginProvider";
 
-const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
+let loggedInUserId;
 
 export default function ChatArea({ chatPartner }) {
     const [messages, setMessages] = useState();
     const [loading, setLoading] = useState(true);
     const msgRef = useRef();
 
+    const { loginInfo } = useContext(LoginContext);
+    useEffect(() => {
+        loggedInUserId = loginInfo.userId;
+    }, [loginInfo]);
+
     // Websocket connection information
-    const { wsIsOpen, wsData, wsSend } = useContext(WebsocketContext);
+    const { wsIsOpen, wsMsg, wsSend } = useContext(WebsocketContext);
 
     // Get messages between logged in user and partner (latest first)
     useEffect(() => {
@@ -23,26 +29,39 @@ export default function ChatArea({ chatPartner }) {
         });
     }, [chatPartner]);
 
+    // Update state when new mesages are received
+    useEffect(() => {
+        if (!wsMsg) return;
+        console.log("Got ws msg:", wsMsg);
+        if (wsMsg.msgType === "chatMsgReceive") {
+            const newChatMsg = wsMsg.msgData;
+            setMessages([newChatMsg, ...messages]);
+        }
+    }, [wsMsg]);
+
     function sendMessage(e) {
         e?.preventDefault();
         const text = msgRef.current.value;
+        if (text.length === 0) return;
         if (!wsIsOpen) {
             console.error(
                 "Websocket connection is not open",
                 wsIsOpen,
-                wsData,
+                wsMsg,
                 wsSend,
             );
             return;
         }
-        // wsSend(
-        //     JSON.stringify({
-        //         msgType: "chatMessageSend",
-        //         text: text,
-        //         receiverId: chatPartner.id,
-        //         timestamp: new Date().toISOString(),
-        //     }),
-        // );
+        wsSend(
+            JSON.stringify({
+                msgType: "chatMsgSend",
+                msgData: {
+                    text: text,
+                    receiverId: chatPartner.id,
+                    timestamp: new Date().toISOString(),
+                },
+            }),
+        );
         msgRef.current.value = "";
     }
 
@@ -74,6 +93,8 @@ export default function ChatArea({ chatPartner }) {
 }
 
 function MessagesList({ messages }) {
+    const date = new Date();
+
     if (messages.length === 0) {
         return <div className="div-with-centered-content">No Messages!</div>;
     }
@@ -89,9 +110,27 @@ function MessagesList({ messages }) {
                             : "received-msg"
                     }
                 >
-                    {msg.text}
+                    <div className="msg-box">{msg.text}</div>
+                    <time>{formatChatDate(new Date(msg.timestamp))}</time>
                 </li>
             ))}
         </ul>
     );
+}
+
+function formatChatDate(d) {
+    const today = new Date();
+    const options = { hour: "numeric", minute: "numeric", hour12: true };
+
+    // Add monday and day if not same
+    if (today.getDate() !== d.getDate() || today.getMonth() !== d.getMonth()) {
+        options.month = "short";
+        options.day = "numeric";
+    }
+
+    // Add year if not same
+    if (today.getFullYear() !== d.getFullYear()) {
+        options.year = "numeric";
+    }
+    return d.toLocaleString("default", options);
 }

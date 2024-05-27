@@ -2,13 +2,13 @@ import { createContext, useEffect, useRef, useState } from "react";
 
 export const WebsocketContext = createContext({
     wsIsOpen: false,
-    wsData: undefined,
+    wsMsg: undefined,
     wsSend: () => {},
 });
 
 export function WebsocketProvider({ children }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [data, setData] = useState(null);
+    const [msg, setMsg] = useState({});
     const ws = useRef(null);
 
     console.log("Setting websocket context");
@@ -19,7 +19,14 @@ export function WebsocketProvider({ children }) {
 
         socket.onopen = () => setIsOpen(true);
         socket.onclose = () => setIsOpen(false);
-        socket.onmessage = (event) => setData(event.data);
+        socket.onmessage = (event) => {
+            try {
+                const parsed = JSON.parse(event.data);
+                setMsg(parsed);
+            } catch (err) {
+                console.log("Error parsing ws msg as json", err);
+            }
+        };
 
         ws.current = socket;
 
@@ -30,7 +37,7 @@ export function WebsocketProvider({ children }) {
 
     const ret = {
         wsIsOpen: isOpen,
-        wsData: data,
+        wsMsg: msg,
         wsSend: ws.current?.send.bind(ws.current),
     };
 

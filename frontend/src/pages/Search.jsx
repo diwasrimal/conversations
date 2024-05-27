@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import Button from "../components/Button";
 import FriendshipManagerButton from "../components/FriendshipManagerButton";
@@ -7,8 +7,9 @@ import Spinner from "../components/Spinner";
 import UserInfo from "../components/UserInfo";
 import "./Search.css";
 import { searchUser } from "../api/functions";
+import { LoginContext } from "../contexts/LoginProvider";
 
-const loggedInUserId = Number(localStorage.getItem("loggedInUserId"));
+let loggedInUserId;
 
 export default function Search() {
     const [loading, setLoading] = useState(false);
@@ -17,6 +18,11 @@ export default function Search() {
     const [unauthorized, setUnauthorized] = useState(false);
     const searchTypeRef = useRef();
     const searchQueryRef = useRef();
+
+    const {loginInfo} = useContext(LoginContext)
+    useEffect(() => {
+        loggedInUserId = loginInfo.userId;
+    }, [loginInfo])
 
     function handleSearch(e) {
         e.preventDefault();
@@ -70,6 +76,8 @@ export default function Search() {
 }
 
 function SearchResults({ results }) {
+    console.log("loggedInUserId", loggedInUserId)
+
     return (
         <div className="search-results-container">
             {results.length === 0 ? (
