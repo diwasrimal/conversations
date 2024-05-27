@@ -2,6 +2,7 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -20,6 +21,18 @@ var clients = make(map[uint64]*websocket.Conn)
 var wsUp = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+type payloadMsgType string
+
+const (
+	chatMsgSend    payloadMsgType = "chatMsgSend"
+	chatMsgReceive payloadMsgType = "chatMsgReceive"
+)
+
+type wsPayload struct {
+	MsgType payloadMsgType `json:"msgType"`
+	MsgData any            `json:"msgData"`
 }
 
 func WSHandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -44,30 +57,34 @@ func WSHandleFunc(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	for true {
-		var data types.Json
-		err := conn.ReadJSON(&data)
+		var payload wsPayload
+		err := conn.ReadJSON(&payload)
 		if err != nil {
 			log.Printf("%T reading ws json data: %v\n", err, err)
 			break
 		}
 
-		log.Printf("ws data: %v\n", data)
+		log.Printf("ws payload: %+v\n", payload)
 
-		switch data["msgType"] {
-		case "chatMessageSend":
-			if err := handleMsgSend(userId, data); err != nil {
-				log.Printf("Error handling msg send: %v\n", err)
-			}
+		switch payload.MsgType {
+		case chatMsgSend:
+			err = handleChatMsgSend(userId, payload.MsgData.(map[string]any))
+		}
+		if err != nil {
+			log.Printf("Error handling %v: %v\n", payload.MsgType, err)
 		}
 	}
 }
 
-func handleMsgSend(senderId uint64, data types.Json) error {
+func handleChatMsgSend(senderId uint64, data types.Json) error {
 	rid, ridOk := data["receiverId"].(float64)
 	text, textOk := data["text"].(string)
 	ts, tsOk := data["timestamp"].(string)
 	if !ridOk || !textOk || !tsOk {
-		return errors.New("Invalid/Missing data fields, ")
+		return errors.New("Invalid/Missing data fields")
+	}
+	if len(text) == 0 {
+		return nil
 	}
 
 	receiverId := uint64(rid)
@@ -76,32 +93,47 @@ func handleMsgSend(senderId uint64, data types.Json) error {
 		return err
 	}
 
-	// Broadcast message to other user if active
-	clientsMu.RLock()
-	peerConn, ok := clients[receiverId]
-	clientsMu.RUnlock()
-	if ok {
-		peerConn.WriteJSON(types.Json{
-			"msgType":   "chatMessageReceive",
-			"senderId":  senderId,
-			"text":      text,
-			"timestamp": timestamp,
-		})
-	}
-
 	// Store the message in database
-	if err := db.RecordMessage(models.Message{
-		SenderId:   senderId,
-		ReceiverId: receiverId,
-		Text:       text,
-		Timestamp:  timestamp,
-	}); err != nil {
-		log.Printf("Error recording message of %v in db: %v\n", senderId, err)
+	msgId, err := db.RecordMessage(senderId, receiverId, text, timestamp)
+	if err != nil {
+		return fmt.Errorf("Can't record msg of %v in db: %v", senderId, err)
 	}
 
 	// Update the last conversation time for two users
 	if err := db.UpdateOrCreateConversation(senderId, receiverId, timestamp); err != nil {
-		log.Printf("Error updating last conv for (%v,%v): %v\n", senderId, receiverId, err)
+		return fmt.Errorf("Can't update last conv for (%v,%v): %v\n", senderId, receiverId, err)
+	}
+
+	// Broadcast the chat message to both sender and receiver
+	payload := wsPayload{
+		MsgType: chatMsgReceive,
+		MsgData: models.Message{
+			Id:         msgId,
+			SenderId:   senderId,
+			ReceiverId: receiverId,
+			Text:       text,
+			Timestamp:  timestamp,
+		},
+	}
+
+	clientsMu.RLock()
+	senderConn, ok := clients[senderId]
+	clientsMu.RUnlock()
+	if ok {
+		err := senderConn.WriteJSON(payload)
+		if err != nil {
+			log.Printf("Error writing json to msg sender: %v\n", err)
+		}
+	}
+
+	clientsMu.RLock()
+	receiverConn, ok := clients[receiverId]
+	clientsMu.RUnlock()
+	if ok {
+		err := receiverConn.WriteJSON(payload)
+		if err != nil {
+			log.Printf("Error writing json to msg receiver: %v\n", err)
+		}
 	}
 
 	return nil

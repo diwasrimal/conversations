@@ -88,11 +88,12 @@ func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 
 // Should be used with auth middleware to work as expected.
 // This function assumes that authentication was handled by
-// middleware and hence just returns a ok status
+// middleware and hence just returns a ok status with logged in userid
 func LoginStatusGet(w http.ResponseWriter, r *http.Request) api.Response {
-	log.Printf("Login status valid for userId: %v\n", r.Context().Value("userId"))
+	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Login status valid for userId: %v\n", userId)
 	return api.Response{
 		Code:    http.StatusOK,
-		Payload: types.Json{},
+		Payload: types.Json{"userId": userId},
 	}
 }

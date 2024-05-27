@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/diwasrimal/conversations/backend/models"
 )
@@ -31,15 +32,17 @@ func GetMessagesAmong(userId1, userId2 uint64) ([]models.Message, error) {
 	return messages, nil // TODO: maybe add limit
 }
 
-func RecordMessage(msg models.Message) error {
-	_, err := pool.Exec(
+func RecordMessage(senderId, receiverId uint64, text string, timestamp time.Time) (uint64, error) {
+	var msgId uint64
+	err := pool.QueryRow(
 		context.Background(),
 		`INSERT INTO messages(sender_id, receiver_id, text, timestamp)
-			VALUES ($1, $2, $3, $4)`,
-		msg.SenderId,
-		msg.ReceiverId,
-		msg.Text,
-		msg.Timestamp,
-	)
-	return err
+			VALUES ($1, $2, $3, $4)
+			RETURNING id`,
+		senderId,
+		receiverId,
+		text,
+		timestamp,
+	).Scan(&msgId)
+	return msgId, err
 }
