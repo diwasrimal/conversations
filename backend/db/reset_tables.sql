@@ -28,8 +28,11 @@ INSERT INTO messages (sender_id, receiver_id, text, timestamp) VALUES
 	(2, 1, 'Yes, finally! It took forever, but I''m glad it''s done.', '2024-05-25 15:05:00+00'),
 	(1, 2, 'Congrats! I know you worked hard on it.', '2024-05-25 15:10:00+00'),
 	(2, 1, 'Thanks, Ram. Your support means a lot.', '2024-05-25 15:15:00+00'),
-	(1, 2, 'Anytime, Shyam. Friends always have each other''s backs.', '2024-05-25 15:20:00+00'),
-	(2, 1, 'Absolutely. By the way, have you seen the new movie out?', '2024-05-25 15:25:00+00'),
+	(1, 2, 'Anytime, Shyam. ', '2024-05-25 15:20:00+00'),
+	(1, 2, 'Friends always have each other''s backs.',  '2024-05-25 15:23:00+00'),
+	(1, 2, 'Right?',  '2024-05-25 15:24:00+00'),
+	(2, 1, 'Absolutely.', '2024-05-25 15:25:00+00'),
+	(2, 1, 'By the way, have you seen the new movie out?', '2024-05-25 15:27:00+00'),
 	(1, 2, 'Not yet, but I heard it''s really good. Want to watch it together?', '2024-05-25 15:30:00+00'),
 	(2, 1, 'Sure, let''s plan for next weekend.', '2024-05-25 15:35:00+00'),
 	(1, 2, 'Perfect. I''ll check the showtimes and let you know.', '2024-05-25 15:40:00+00'),
@@ -37,7 +40,8 @@ INSERT INTO messages (sender_id, receiver_id, text, timestamp) VALUES
 	(1, 3, 'Hi Carol, do you have any new photo tips?', '2024-05-25 15:00:00+00'),
 	(3, 1, 'Hey Alice, I do! Let''s chat more.', '2024-05-25 15:05:00+00'),
 	(4, 5, 'Eve, have you heard the new album by XYZ?', '2024-05-25 16:10:00+00'),
-	(5, 4, 'Yes, David! It''s amazing!', '2024-05-25 16:15:00+00');
+	(5, 4, 'Yes, David!', '2024-05-25 16:15:00+00'),
+	(5, 4, 'It''s amazing!', '2024-05-25 16:20:00+00');
 
 INSERT INTO conversations (user1_id, user2_id, timestamp) VALUES
 	(1, 2, '2024-05-25 15:45:00+00'),

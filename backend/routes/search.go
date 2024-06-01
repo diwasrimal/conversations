@@ -29,7 +29,7 @@ func SearchGet(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{"message": "Search query cannot be empty"},
 		}
 	}
-	matches, err := db.SearchUser(searchType, searchQuery)
+	results, err := db.SearchUser(searchType, searchQuery)
 	if err != nil {
 		log.Printf("Error getting user search results from db: %v\n", err)
 		return api.Response{
@@ -39,6 +39,6 @@ func SearchGet(w http.ResponseWriter, r *http.Request) api.Response {
 	}
 	return api.Response{
 		Code:    http.StatusOK,
-		Payload: types.Json{"matches": matches},
+		Payload: types.Json{"results": results},
 	}
 }

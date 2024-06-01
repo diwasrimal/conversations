@@ -77,6 +77,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) api.Response {
 			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
 			Path:     "/",
+			MaxAge:   7 * 24 * 60 * 60, // 7 days
 		})
 	}
 	log.Println("Logged in!")
