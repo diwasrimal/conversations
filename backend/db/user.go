@@ -97,16 +97,17 @@ func GetRecentChatPartners(userId uint64) ([]models.User, error) {
 	var partners []models.User
 	rows, err := pool.Query(
 		context.Background(),
-		`SELECT * FROM users WHERE id IN (
-			SELECT CASE WHEN user1_id = $1 THEN user2_id ELSE user1_id END
+		`SELECT u.* FROM users u JOIN (
+			SELECT
+				CASE WHEN user1_id = $1 THEN user2_id ELSE user1_id END
+			AS id, timestamp
 			FROM conversations WHERE
 			user1_id = $1 OR user2_id = $1
-			ORDER BY timestamp DESC
-		)`,
+		) as subq ON u.id = subq.id ORDER by subq.timestamp DESC`,
 		userId,
 	)
 	if err != nil {
-		return partners, nil
+		return partners, err
 	}
 	defer rows.Close()
 	for rows.Next() {
