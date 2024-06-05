@@ -3,7 +3,6 @@ todo.txt
 .zed
 .env
 backend/app
-go.sum
 tmp*
 
 Tmp.jsx
