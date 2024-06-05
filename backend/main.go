@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -12,6 +11,8 @@ import (
 
 	"github.com/rs/cors"
 )
+
+const addr = ":3030"
 
 func main() {
 	db.MustInit()
@@ -48,7 +49,5 @@ func main() {
 	mux.Handle("/", http.FileServer(http.Dir("./dist")))
 
 	finalHandler := cors.AllowAll().Handler(mux)
-	port := 3030
-	addr := fmt.Sprintf(":%v", port)
 	log.Fatal(http.ListenAndServe(addr, finalHandler))
 }
