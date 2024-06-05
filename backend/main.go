@@ -44,6 +44,9 @@ func main() {
 		mux.Handle(route, handler)
 	}
 
+	// File server to serve frontend build files at /build
+	mux.Handle("/", http.FileServer(http.Dir("./dist")))
+
 	finalHandler := cors.AllowAll().Handler(mux)
 	port := 3030
 	addr := fmt.Sprintf(":%v", port)
