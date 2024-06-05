@@ -165,6 +165,7 @@ function cancelRequest(to: User, onSuccess?: () => void) {
         );
 }
 
+// @ts-ignore
 function rejectRequest(from: User, onSuccess?: () => void) {
     console.log("TODO: implement rejectRequest()");
 }

@@ -8,9 +8,9 @@ import {
 import { WsPayload } from "../types/WsPayload";
 
 type WebsocketContextType = {
-    wsIsOpen: boolean;
-    wsData: WsPayload | undefined;
-    wsSend: WebSocket["send"] | undefined;
+    readonly wsIsOpen: boolean;
+    readonly wsData: WsPayload | undefined;
+    readonly wsSend: WebSocket["send"] | undefined;
 };
 
 const def = { wsIsOpen: false, wsData: undefined, wsSend: () => {} };
@@ -20,7 +20,7 @@ export const WebsocketContext = createContext<WebsocketContextType>(def);
 export function WebsocketProvider({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
     const [data, setData] = useState<WsPayload>();
-    const ws = useRef<WebSocket>(null);
+    const ws: React.MutableRefObject<WebSocket | null> = useRef(null);
 
     useEffect(() => {
         const socketProtocol = location.protocol === "https:" ? "wss" : "ws";
@@ -45,6 +45,7 @@ export function WebsocketProvider({ children }: PropsWithChildren) {
         };
 
         ws.current = socket;
+
         return () => {
             socket.close();
         };

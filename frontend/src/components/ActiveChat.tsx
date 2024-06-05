@@ -66,15 +66,48 @@ export default function ActiveChat() {
     }, [messages, activeChatPartner]);
 
     // Update messages state when received through websocket connection
+    // If the message was with currently active chat partner, then we have to setMessages().
+    // If some other user sent a message, we store that in session storage corresponding to sender.
     const { wsData } = useContext(WebsocketContext);
     useEffect(() => {
+        console.log("wsData has changed:", wsData);
         if (wsData?.msgType === "chatMsgReceive") {
             const msg = wsData.msgData as Message;
-            if (msg.receiverId === activeChatPartner?.id) {
-                setMessages([wsData.msgData as Message, ...messages]);
-            } else {
-                // TODO: save message somewhere
+            const sentByPartner = msg.senderId === activeChatPartner?.id;
+            const sentByMePreviously =
+                msg.senderId === getLoggedInUserId() &&
+                msg.receiverId === activeChatPartner?.id;
+
+            if (sentByMePreviously || sentByPartner) {
+                setMessages([msg, ...messages]);
+                return;
             }
+
+            // Message was sent my user that's not the active chat partner
+            // In this case we update the messages in session storage for the sender
+            // If messages are not in session, fetch from server and store to session storage
+            const prevMsgs = getMessagesFromSession(msg.senderId);
+            if (prevMsgs !== undefined) {
+                saveMessagesToSession(msg.senderId, [msg, ...prevMsgs]);
+                return;
+            }
+            const url = `/api/messages/${msg.senderId}`;
+            fetch(url, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            })
+                .then((res) => makePayload(res))
+                .then((payload) => {
+                    if (payload.ok) {
+                        saveMessagesToSession(msg.senderId, [
+                            msg,
+                            ...(payload.messages as Message[]),
+                        ]);
+                    } else {
+                        setUnauthorized(payload.statusCode === 401);
+                    }
+                })
+                .catch((err) => console.error(`Error: GET ${url}:`, err));
         }
     }, [wsData]);
 
@@ -84,7 +117,7 @@ export default function ActiveChat() {
 
     return (
         <div className="h-full w-full flex flex-col">
-            {/* User info */}re
+            {/* User info */}
             <div className="p-2 border-b-2 font-medium drop-shadow-md">
                 <UserInfo user={activeChatPartner} />
             </div>
@@ -107,6 +140,7 @@ export default function ActiveChat() {
 // Assumes that messages is not []
 function MessageList({ messages }: { messages: Message[] }) {
     // Create a list of group of messages based on who sent them
+    // console.log("messages:", messages);
     const messageGroups = useMemo(() => {
         if (messages.length === 0) return [];
         const groups: Message[][] = [];
@@ -191,12 +225,14 @@ function MessageBox({ receiverId }: { receiverId: number }) {
         messageRef.current!.value = "";
     }
 
-    function sendMessageOnEnterKey(e) {
+    const sendMessageOnEnterKey: React.KeyboardEventHandler<
+        HTMLTextAreaElement
+    > = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
-    }
+    };
 
     return (
         <form

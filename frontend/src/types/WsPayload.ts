@@ -1,4 +1,4 @@
 export type WsPayload = {
-    msgType: string;
-    msgData: object;
+    readonly msgType: string;
+    readonly msgData: object;
 };
