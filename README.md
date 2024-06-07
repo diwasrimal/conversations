@@ -1,37 +1,22 @@
 # Conversations
 
-Chat application made with Go and React. Work in Progress...
+Chat application made with Go and React.
 
-## Build and run
 
-1. Clone the repository
-```console
-git clone https://github.com/diwasrimal/conversations.git
-cd conversations
-```
+## Build and Run
 
-2. Build backend and initialize postgresql database
-```
-cd backend
-make
-```
-or 
+The frontend build files are placed inside `backend/dist` and are served by
+the backend server.
 
 ```console
-cd backend
-psql createdb chatdb
-psql -d chatdb -f ./db/create_tables.sql
-go build -o app .
-```
-
-2. Run the backend connecting database
-```console
-DATABASE_URL="postgres://user:password@host/chatdb" ./app
-```
-
-3. Run frontend
-```console
-cd frontend
-npm install
-npm run dev
+$ git clone https://github.com/diwasrimal/conversations.git
+$ cd conversations/frontend
+$ npm install
+$ npm run build
+$ cp -r ./dist ../backend/
+$ cd ../backend
+$ psql createdb chatdb
+$ psql -d chatdb -f ./db/create_tables.sql
+$ go build -o app .
+$ POSTGRES_URL="postgres://user:password@host/chatdb" ./app
 ```
