@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/diwasrimal/conversations/backend/api"
 	"github.com/diwasrimal/conversations/backend/db"
@@ -45,9 +46,23 @@ func main() {
 		mux.Handle(route, handler)
 	}
 
-	// File server to serve frontend build files
-	mux.Handle("/", http.FileServer(http.Dir("./dist")))
+	env, ok := os.LookupEnv("MODE")
+	if !ok {
+		panic("Environment variable 'MODE' not set, set it to \"dev\" or \"prod\"")
+	}
+	switch env {
+	case "dev":
+		// Allow cross origin requests in dev mode
+		finalHandler := cors.AllowAll().Handler(mux)
+		log.Printf("Server running on %v...\n", addr)
+		log.Fatal(http.ListenAndServe(addr, finalHandler))
+	case "prod":
+		// Use a file server to serve frontend build files in production
+		mux.Handle("/", http.FileServer(http.Dir("./dist")))
+		log.Printf("Server running on %v...\n", addr)
+		log.Fatal(http.ListenAndServe(addr, mux))
+	default:
+		panic("Invalid enviroment variable value for 'MODE'")
+	}
 
-	finalHandler := cors.AllowAll().Handler(mux)
-	log.Fatal(http.ListenAndServe(addr, finalHandler))
 }
