@@ -11,9 +11,9 @@ import (
 var pool *pgxpool.Pool
 
 func MustInit() {
-	url, set := os.LookupEnv("DATABASE_URL")
+	url, set := os.LookupEnv("POSTGRES_URL")
 	if !set {
-		panic("Environment variable 'DATABASE_URL' not set!")
+		panic("Environment variable 'POSTGRES_URL' not set!")
 	}
 	var err error
 	pool, err = pgxpool.New(context.Background(), url)
