@@ -37,7 +37,7 @@ export default function People() {
                 })
                 .catch((err) => console.error(`Error: GET ${url}`, err))
                 .finally(() => setLoading(false));
-        }, 300);
+        }, 250);
     }, []);
 
     // Call debounced search function on each keystroke
@@ -49,17 +49,19 @@ export default function People() {
                 autoFocus
                 type="text"
                 onChange={(e) => setInput(e.target.value)}
-                className="w-full py-1 px-2 outline-none border-gray-200"
-                placeholder="Search"
+                className="w-full py-2 px-4 rounded-lg outline-none border-none bg-gray-100"
+                placeholder="Search people"
             />
             {loading ? (
                 <ContentCenteredDiv>Loading...</ContentCenteredDiv>
+            ) : results.length === 0 ? (
+                <ContentCenteredDiv>No matches</ContentCenteredDiv>
             ) : (
-                <ul className="border h-full">
+                <ul className="h-full">
                     {results.map((user) => (
                         <li
                             key={user.id}
-                            className="flex items-center justify-between p-4 border"
+                            className="flex items-center justify-between p-4 border-b"
                         >
                             <UserInfo user={user} />
                             {user.id !== loggedInId && (

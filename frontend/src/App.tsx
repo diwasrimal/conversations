@@ -12,6 +12,7 @@ import BaseLayout from "./layouts/BaseLayout";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { WebsocketProvider } from "./contexts/WebsocketProvider";
+import Friends from "./components/Friends";
 
 const router = createBrowserRouter([
     {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
             {
                 path: "/requests",
                 element: <Requests />,
+            },
+            {
+                path: "/friends",
+                element: <Friends />,
             },
         ],
     },

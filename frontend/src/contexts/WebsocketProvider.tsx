@@ -13,7 +13,7 @@ type WebsocketContextType = {
     readonly wsSend: WebSocket["send"] | undefined;
 };
 
-const def = { wsIsOpen: false, wsData: undefined, wsSend: () => {} };
+const def = { wsIsOpen: false, wsData: undefined, wsSend: undefined };
 
 export const WebsocketContext = createContext<WebsocketContextType>(def);
 

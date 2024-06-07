@@ -6,27 +6,25 @@ import ContentCenteredDiv from "./ContentCenteredDiv";
 import UserInfo from "./UserInfo";
 import UserActions from "./UserActions";
 
-export default function Requests() {
-    const [requestors, setRequestors] = useState<User[]>([]);
+export default function Friends() {
+    const [friends, setFriends] = useState<User[]>([]);
     const [unauthorized, setUnauthorized] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`/api/friend-requestors`, {
+        fetch(`/api/friends`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
             .then((res) => makePayload(res))
             .then((payload) => {
                 if (payload.ok) {
-                    setRequestors((payload.friendRequestors as User[]) || []);
+                    setFriends((payload.friends as User[]) || []);
                 } else {
                     setUnauthorized(payload.statusCode === 401);
                 }
             })
-            .catch((err) =>
-                console.error(`Error: GET /api/friend-requestors`, err),
-            )
+            .catch((err) => console.error(`Error: GET /api/friends`, err))
             .finally(() => setLoading(false));
     }, []);
 
@@ -34,14 +32,14 @@ export default function Requests() {
 
     return (
         <div className="h-full flex flex-col">
-            <h2 className="p-2">Requests</h2>
+            <h2 className="p-2">Friends</h2>
             {loading ? (
                 <ContentCenteredDiv>Loading...</ContentCenteredDiv>
-            ) : requestors.length === 0 ? (
-                <ContentCenteredDiv>No friend requests!</ContentCenteredDiv>
+            ) : friends.length === 0 ? (
+                <ContentCenteredDiv>No friends!</ContentCenteredDiv>
             ) : (
                 <ul>
-                    {requestors.map((user) => (
+                    {friends.map((user) => (
                         <li
                             key={user.id}
                             className="flex items-center justify-between p-4 border-b"

@@ -118,7 +118,7 @@ export default function ActiveChat() {
     return (
         <div className="h-full w-full flex flex-col">
             {/* User info */}
-            <div className="p-2 border-b-2 font-medium drop-shadow-md">
+            <div className="p-3 border-b-2 font-medium drop-shadow-md">
                 <UserInfo user={activeChatPartner} />
             </div>
             {/* Messages */}

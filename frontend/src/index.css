@@ -22,5 +22,5 @@
 @tailwind utilities;
 
 :root {
-    --nav-width: 100px;
+    --nav-width: 50px;
 }
