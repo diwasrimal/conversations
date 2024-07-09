@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/diwasrimal/conversations/backend/api"
 	"github.com/diwasrimal/conversations/backend/db"
@@ -50,6 +51,7 @@ func main() {
 	if !ok {
 		panic("Environment variable 'MODE' not set, set it to \"dev\" or \"prod\"")
 	}
+
 	switch env {
 	case "dev":
 		// Allow cross origin requests in dev mode
@@ -58,7 +60,17 @@ func main() {
 		log.Fatal(http.ListenAndServe(addr, finalHandler))
 	case "prod":
 		// Use a file server to serve frontend build files in production
-		mux.Handle("/", http.FileServer(http.Dir("./dist")))
+		// also redirect all other routes to /index.html so that react handles it
+		distDir := "./dist"
+		fileServer := http.FileServer(http.Dir(distDir))
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			path := filepath.Join(distDir, r.URL.Path)
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				http.ServeFile(w, r, filepath.Join(distDir, "index.html"))
+				return
+			}
+			fileServer.ServeHTTP(w, r)
+		})
 		log.Printf("Server running on %v...\n", addr)
 		log.Fatal(http.ListenAndServe(addr, mux))
 	default:
